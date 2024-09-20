@@ -57,7 +57,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
           <>
             <div className="flex flex-wrap items-center justify-between w-full lg:w-auto">
               <Link href="/">
-                <span className="flex items-center space-x-2 text-2xl font-medium text-[#00796b] dark:text-gray-100">
+                <span className="flex items-center space-x-2 text-2xl font-medium text-[#4682B4] dark:text-gray-100">
                   <Image
                     src="/img/logo.png"
                     alt="N"
@@ -70,7 +70,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
 
               <Disclosure.Button
                 aria-label="Toggle Menu"
-                className="px-2 py-1 ml-auto text-[#3da399] rounded-md lg:hidden hover:text-[#3da399] focus:text-[#00796b] focus:bg-indigo-100 focus:outline-none dark:text-gray-300 dark:focus:bg-trueGray-700"
+                className="px-2 py-1 ml-auto text-[#6495ED] rounded-md lg:hidden hover:text-[#6495ED] focus:text-[#4682B4] focus:bg-indigo-100 focus:outline-none dark:text-gray-300 dark:focus:bg-trueGray-700"
               >
                 <svg
                   className="w-6 h-6 fill-current"
@@ -94,7 +94,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
 
               <Disclosure.Panel className="flex flex-wrap w-full my-5 lg:hidden">
                 {navItems.map((item, index) => (
-                  <Link key={index} href={`/${item.path}`} className="w-full px-4 py-2 -ml-4 text-[#3da399] rounded-md dark:text-gray-300 hover:text-[#00796b] focus:text-[#00796b] focus:bg-indigo-100 dark:focus:bg-gray-800 focus:outline-none">
+                  <Link key={index} href={`/${item.path}`} className="w-full px-4 py-2 -ml-4 text-[#6495ED] rounded-md dark:text-gray-300 hover:text-[#4682B4] focus:text-[#4682B4] focus:bg-indigo-100 dark:focus:bg-gray-800 focus:outline-none">
                     {item.label}
                   </Link>
                 ))}
@@ -113,7 +113,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
                     </button>
                   </div>
                 ) : (
-                  <Link href="/auth/signin" className="w-full px-6 py-2 mt-3 text-center text-white bg-[#00796b] rounded-md lg:ml-5">
+                  <Link href="/auth/signin" className="w-full px-6 py-2 mt-3 text-center text-white bg-[#4682B4] rounded-md lg:ml-5">
                     Entrar
                   </Link>
                 )}
@@ -128,7 +128,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
         <ul className="items-center justify-end flex-1 pt-6 list-none lg:pt-0 lg:flex">
           {navItems.map((menu, index) => (
             <li className="mr-3 nav__item" key={index}>
-              <Link href={`/${menu.path}`} className=" inline-block px-4 py-2 text-md font-normal text-[#00796b] no-underline rounded-md dark:text-gray-200 hover:text-[#00796b] focus:text-[#00796b] focus:bg-indigo-100 focus:outline-none dark:focus:bg-gray-800">
+              <Link href={`/${menu.path}`} className=" inline-block px-4 py-2 text-md font-normal text-[#4682B4] no-underline rounded-md dark:text-gray-200 hover:text-[#4682B4] focus:text-[#4682B4] focus:bg-indigo-100 focus:outline-none dark:focus:bg-gray-800">
                 {menu.label}
               </Link>
             </li>
@@ -154,7 +154,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
             </button>
           </>
         ) : (
-          <Link href="/auth/signin" className="px-6 py-2 text-white bg-[#00796b] rounded-md md:ml-5">
+          <Link href="/auth/signin" className="px-6 py-2 text-white bg-[#4682B4] rounded-md md:ml-5">
             Entrar
           </Link>
         )}

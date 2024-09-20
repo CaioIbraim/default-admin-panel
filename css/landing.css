@@ -24,7 +24,7 @@
 .hero-content h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
-    color: #00796b;
+    color: #4682B4;
     /* Cor principal */
 }
 
@@ -40,7 +40,7 @@
     padding: 10px 20px;
     font-size: 1rem;
     color: #fff;
-    background-color: #00796b;
+    background-color: #4682B4;
     /* Cor do botão */
     text-decoration: none;
     border-radius: 5px;

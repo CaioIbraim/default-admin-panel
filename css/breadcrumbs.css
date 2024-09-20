@@ -21,7 +21,7 @@
 
 .breadcrumb-link {
     text-decoration: none;
-    color: #00796b;
+    color: #4682B4;
     /* Cor principal para links */
     font-weight: normal;
     margin-right: 4px;
@@ -36,13 +36,13 @@
     /* Espaçamento entre ícone e texto */
     font-size: 1.2rem;
     /* Tamanho do ícone */
-    color: #00796b;
+    color: #4682B4;
     /* Cor do ícone para combinar com o link */
 }
 
 .breadcrumb-item+.breadcrumb-item::before {
     content: '>';
     margin: 0 8px;
-    color: #00796b;
+    color: #4682B4;
     /* Cor do separador */
 }

@@ -189,7 +189,7 @@ const AssociadoManagement = () => {
 
       <Button
         type="primary"
-        className="mb-5 p-5 bg-[#3da399] text-white rounded flex items-center w-full"
+        className="mb-5 p-5 bg-[#6495ED] text-white rounded flex items-center w-full"
         icon={<FaPlus />}
         onClick={() => openDrawer()}
       >

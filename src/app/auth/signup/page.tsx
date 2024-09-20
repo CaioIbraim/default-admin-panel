@@ -80,7 +80,7 @@ const SignUp = () => {
 
      
     <Link href="/">
-        <span className="flex items-center justify-center space-x-2 text-2xl font-medium text-[#00796b] dark:text-gray-100">
+        <span className="flex items-center justify-center space-x-2 text-2xl font-medium text-[#4682B4] dark:text-gray-100">
           <Image
             src="/img/logo.png"
             alt="STIVESGPRO"
@@ -91,7 +91,7 @@ const SignUp = () => {
       </Link>
 
                 
-      <h2 className='flex flex-row justify-center  items-center w-full space-x-4 text-[#00796b] mt-2 font-bold'> <FaPlus className="hero-icon" /> <span> Cadastre-se </span></h2>
+      <h2 className='flex flex-row justify-center  items-center w-full space-x-4 text-[#4682B4] mt-2 font-bold'> <FaPlus className="hero-icon" /> <span> Cadastre-se </span></h2>
      
       <input
         type="email"

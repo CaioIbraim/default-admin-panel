@@ -15,7 +15,7 @@ export function Footer() {
               {" "}
               <Link
                 href="/"
-                className="flex items-center space-x-2 text-2xl font-medium text-[#00796b] dark:text-gray-100"
+                className="flex items-center space-x-2 text-2xl font-medium text-[#4682B4] dark:text-gray-100"
               >
                 <Image
                   src="/img/logo.png"
@@ -38,7 +38,7 @@ export function Footer() {
                 <Link
                   key={index}
                   href="/"
-                  className="w-full px-4 py-2 text-gray-500 rounded-md dark:text-gray-300 hover:text-[#00796b] focus:text-[#00796b] focus:bg-indigo-100 focus:outline-none dark:focus:bg-trueGray-700"
+                  className="w-full px-4 py-2 text-gray-500 rounded-md dark:text-gray-300 hover:text-[#4682B4] focus:text-[#4682B4] focus:bg-indigo-100 focus:outline-none dark:focus:bg-trueGray-700"
                 >
                   {item}
                 </Link>
@@ -51,7 +51,7 @@ export function Footer() {
                 <Link
                   key={index}
                   href="/"
-                  className="w-full px-4 py-2 text-gray-500 rounded-md dark:text-gray-300 hover:text-[#00796b] focus:text-[#00796b] focus:bg-indigo-100 focus:outline-none dark:focus:bg-trueGray-700"
+                  className="w-full px-4 py-2 text-gray-500 rounded-md dark:text-gray-300 hover:text-[#4682B4] focus:text-[#4682B4] focus:bg-indigo-100 focus:outline-none dark:focus:bg-trueGray-700"
                 >
                   {item}
                 </Link>

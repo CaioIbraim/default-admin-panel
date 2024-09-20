@@ -23,7 +23,7 @@
 .auth-container button {
     width: 100%;
     padding: 10px;
-    background-color: #00796b;
+    background-color: #4682B4;
     color: white;
     border: none;
     border-radius: 4px;
@@ -31,5 +31,5 @@
 }
 
 .auth-container button:hover {
-    background-color: #00796b;
+    background-color: #4682B4;
 }

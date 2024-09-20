@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, Layout, Button } from 'antd';
-import { FaSignOutAlt, FaHome, FaUsers, FaBusinessTime, FaMoneyBill } from 'react-icons/fa';
+import { FaSignOutAlt, FaHome, FaUsers, FaBusinessTime, FaMoneyBill, FaRProject } from 'react-icons/fa';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import Image from 'next/image';
+import { FaBarsProgress, FaDiagramProject } from 'react-icons/fa6';
 
 const { Sider } = Layout;
 
@@ -25,7 +26,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
 
   const navItems = [
     { icon: <FaHome />, path: 'inicio', label: 'Inicio' },
-    { icon: <FaUsers />, path: 'associados', label: 'Associados' },
+    { icon: <FaUsers />, path: 'alunos', label: 'Alunos' },
+    { icon: <FaDiagramProject />, path: 'projetos', label: 'Projetos' },
+    { icon: <FaBarsProgress />, path: 'treinamentos', label: 'Treinamentos' },
     { icon: <FaBusinessTime />, path: 'empresas', label: 'Empresas' },
     { icon: <FaMoneyBill />, path: 'pagamentos', label: 'Pagamentos' },
   ];
@@ -51,14 +54,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
       >
         <div className="p-4 flex items-center justify-between">
           <Link href="/">
-            <div className="flex items-center space-x-2 text-2xl font-medium text-[#00796b] dark:text-gray-100">
+            <div className="flex items-center space-x-2 text-2xl font-medium text-[#4682B4] dark:text-gray-100">
               <Image
                 src="/img/logo.png"
                 alt="Logo"
-                width={32}
-                height={32}
+                width={132}
+                height={132}
               />
-              <span className={`transition-transform ${isOpen ? 'block' : 'hidden'}`}>STIVESG</span>
+             
             </div>
           </Link>
           <Button
