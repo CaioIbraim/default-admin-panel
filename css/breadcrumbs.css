@@ -1,0 +1,48 @@
+.breadcrumb-container {
+    padding: 10px;
+    background-color: #f0f0f0;
+    /* Cor de fundo mais clara para contrastar com o texto */
+    border-bottom: 1px solid #dcdcdc;
+    /* Linha fina para separar do conteúdo abaixo */
+}
+
+.breadcrumb {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-link {
+    text-decoration: none;
+    color: #00796b;
+    /* Cor principal para links */
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-icon {
+    margin-right: 4px;
+    /* Espaçamento entre ícone e texto */
+    font-size: 1.2rem;
+    /* Tamanho do ícone */
+    color: #00796b;
+    /* Cor do ícone para combinar com o link */
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: '>';
+    margin: 0 8px;
+    color: #00796b;
+    /* Cor do separador */
+}
