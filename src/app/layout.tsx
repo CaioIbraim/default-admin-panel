@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabaseClient';
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Swal from 'sweetalert2';
-import Breadcrumbs from '../components/Breadcrumbs';
 import { Sidebar } from '../components/Sidebar';
 import "./globals.css";
 
@@ -22,10 +21,8 @@ interface SidelayoutProps extends MyComponentProps {
   userAvatar: string | null;
 }
 
-
-// components/Sidebar.tsx
 import { Layout, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+
 
 const { Sider } = Layout;
 

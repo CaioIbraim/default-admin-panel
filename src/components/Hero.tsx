@@ -4,9 +4,9 @@ import heroImg from "../../public/1.png";
 
 export const Hero = () => {
   return (
-    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${heroImg.src})` }}>
+    <div className="bg-cover bg-center" style={{ backgroundImage: `url(${heroImg.src})` }}>
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative flex flex-col justify-center items-center min-h-screen text-center text-white px-6 py-12">
+      <div className="relative flex flex-col justify-center items-center min-h-screen text-center text-white">
         <Link href="/">
           <span className="flex items-center justify-center space-x-2 text-2xl font-medium text-[#6495ED]">
             <Image
