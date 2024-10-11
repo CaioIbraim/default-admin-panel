@@ -98,19 +98,19 @@ export default function RootLayout({ children }: MyComponentProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (loggedIn) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Logged in successfully!',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        router.push('/inicio');
-      });
-    }
-  }, [loggedIn, router]);
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Success',
+  //       text: 'Logged in successfully!',
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     }).then(() => {
+  //       router.push('/inicio');
+  //     });
+  //   }
+  // }, [loggedIn, router]);
 
   const noMenuPaths = ['/', '/auth/signin', '/auth/signup', '/landing'];
 

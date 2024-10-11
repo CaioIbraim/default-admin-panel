@@ -32,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
     { icon: <FaBarsProgress />, path: 'treinamentos', label: 'Treinamentos' },
     { icon: <FaBusinessTime />, path: 'empresas', label: 'Empresas' },
     { icon: <FaMoneyBill />, path: 'pagamentos', label: 'Pagamentos' },
+    { icon: <FaMoneyBill />, path: 'testes', label: 'Testes' },
   ];
 
   return (

@@ -6,167 +6,136 @@ import { FaPen, FaTrash, FaPlus, FaInfo } from 'react-icons/fa';
 import { supabase } from '../../lib/supabaseClient';
 import Link from 'next/link';
 import dayjs from 'dayjs';
-import AssociadoForm from './AssociadoForm';
-import { Empresa } from '../types/Empresa'; 
-import { Associado } from '../types/Associado'; 
+import AlunoForm from './AlunoForm';
 
-const AssociadoManagement = () => {
+import { Aluno } from '../types/Aluno'; 
+
+const AlunoManagement = () => {
   const [form] = Form.useForm();
-  const [associados, setAssociados] = useState<Associado[]>([]);
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [Alunos, setAlunos] = useState<Aluno[]>([]);
+  
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [currentAssociado, setCurrentAssociado] = useState<Associado | undefined>(undefined);
+  const [currentAluno, setCurrentAluno] = useState<Aluno | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const itemsPerPage = 10;
 
-  const fetchAssociadosData = async () => {
+  const fetchAlunosData = async () => {
     const { data, error, count } = await supabase
-      .from('associados')
+      .from('alunos')
       .select('*', { count: 'exact' })
       .ilike('nome', `%${searchTerm}%`)
       .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
     if (data) {
-      setAssociados(data);
+      setAlunos(data);
       setTotalItems(count || 0);
     } else if (error) {
-      console.error('Erro ao buscar associados:', error.message);
+      console.error('Erro ao buscar Alunos:', error.message);
     }
   };
 
-  const fetchEmpresas = async () => {
-    const { data, error } = await supabase.from('empresas').select('*');
-    if (data) {
-      setEmpresas(data);
-    } else if (error) {
-      console.error('Erro ao buscar empresas:', error.message);
-    }
-  };
 
   useEffect(() => {
     const fetchUserData = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (data && !error) {
-        fetchAssociadosData();
-        fetchEmpresas();
+        fetchAlunosData();
       }
     };
 
     fetchUserData();
   }, [searchTerm, currentPage]);
 
-  const saveAssociado = async (values: any) => {
+  const saveAluno = async (values: any) => {
     try {
-      const associado = { ...values, id: currentAssociado?.id };
+      const Aluno = { ...values, id: currentAluno?.id };
       
       const { data, error } = await supabase
-        .from('associados')
+        .from('Alunos')
         .select('*')
-        .eq('id', associado.id);
+        .eq('id', Aluno.id);
 
       if (data?.length !== 0) {
         // Realizar update
         const { error } = await supabase
-          .from('associados')
-          .update(associado)
-          .eq('id', associado.id);
+          .from('Alunos')
+          .update(Aluno)
+          .eq('id', Aluno.id);
 
         if (error) throw error;
 
         notification.success({
-          message: 'Associado Atualizado',
-          description: 'Associado atualizado com sucesso.',
+          message: 'Aluno Atualizado',
+          description: 'Aluno atualizado com sucesso.',
         });
       } else {
         // Inserir
         const { error } = await supabase
-          .from('associados')
-          .insert([associado]);
+          .from('Alunos')
+          .insert([Aluno]);
 
         if (error) throw error;
 
         notification.success({
-          message: 'Associado Adicionado',
-          description: 'Associado adicionado com sucesso.',
+          message: 'Aluno Adicionado',
+          description: 'Aluno adicionado com sucesso.',
         });
       }
 
       closeDrawer();
-      fetchAssociadosData();
+      fetchAlunosData();
     } catch (error) {
-      console.error('Erro ao salvar associado:', (error as Error).message);
+      console.error('Erro ao salvar Aluno:', (error as Error).message);
       notification.error({
         message: 'Erro',
-        description: 'Ocorreu um erro ao salvar o associado.',
+        description: 'Ocorreu um erro ao salvar o Aluno.',
       });
     }
   };
 
-  const deleteAssociado = (id: string) => {
+  const deleteAluno = (id: number) => {
     Modal.confirm({
       title: 'Confirmar Exclusão',
-      content: 'Você tem certeza que deseja excluir este associado?',
+      content: 'Você tem certeza que deseja excluir este Aluno?',
       okText: 'Sim',
       okType: 'danger',
       cancelText: 'Não',
       onOk: async () => {
         try {
           const { error } = await supabase
-            .from('associados')
+            .from('Alunos')
             .delete()
             .eq('id', id);
 
           if (error) throw error;
 
-          fetchAssociadosData();
+          fetchAlunosData();
 
           notification.success({
-            message: 'Associado Excluído',
-            description: 'Associado excluído com sucesso.',
+            message: 'Aluno Excluído',
+            description: 'Aluno excluído com sucesso.',
           });
         } catch (error) {
-          console.error('Erro ao excluir associado:', (error as Error).message);
+          console.error('Erro ao excluir Aluno:', (error as Error).message);
         }
       },
     });
   };
 
-  const openDrawer = (associado?: Associado) => {
-    setCurrentAssociado(associado || {
-      id: crypto.randomUUID(),
-      nome: '',
-      documento: '',
-      endereco: '',
-      data_de_nascimento: undefined,
-      empresa_id: '',
-      data_admissao_empresa: undefined,
-      data_ingresso_sindicato: undefined,
-      data_saida_sindicato: undefined,
-      pis: '',
-      ctps: '',
-      desconto_em_folha: false,
-      foto: '',
-      matricula: '',
-      naturalidade: '',
-      estado_civil: '',
-      cargo_empresa: '',
-      filhos: false,
-      quantos_filhos: 0,
-      nome_pai: '',
-      nome_mae: '',
-      titulo_eleitor: '',
-      observacao: '',
+  const openDrawer = (Aluno?: Aluno) => {
+    setCurrentAluno(Aluno || {
+                        nome: '',
+                        email: '',
+                        dataCadastro: '',
+                        ativo: '',
+                        atualizadoEm: '',
     });
-    setIsEditing(!!associado);
+    setIsEditing(!!Aluno);
     form.setFieldsValue({
-      ...associado,
-      data_de_nascimento: associado?.data_de_nascimento ? dayjs(associado.data_de_nascimento) : null,
-      data_admissao_empresa: associado?.data_admissao_empresa ? dayjs(associado.data_admissao_empresa) : null,
-      data_ingresso_sindicato: associado?.data_ingresso_sindicato ? dayjs(associado.data_ingresso_sindicato) : null,
-      data_saida_sindicato: associado?.data_saida_sindicato ? dayjs(associado.data_saida_sindicato) : null,
+      ...Aluno,
     });
     setDrawerVisible(true);
   };
@@ -178,10 +147,10 @@ const AssociadoManagement = () => {
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="text-xl text-center mb-5">Gerenciamento de Associados</h1>
+      <h1 className="text-xl text-center mb-5">Gerenciamento de Alunos</h1>
 
       <Input
-        placeholder="Pesquisar associado..."
+        placeholder="Pesquisar Aluno..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-5"
@@ -193,42 +162,42 @@ const AssociadoManagement = () => {
         icon={<FaPlus />}
         onClick={() => openDrawer()}
       >
-        Adicionar Associado
+        Adicionar Aluno
       </Button>
 
       <List
         itemLayout="horizontal"
-        dataSource={associados}
-        renderItem={(associado) => (
+        dataSource={Alunos}
+        renderItem={(Aluno) => (
           <List.Item
             actions={[
               <Button
-                key={associado.id}
+                key={Aluno.id}
                 type="primary"
                 icon={<FaPen />}
-                onClick={() => openDrawer(associado)}
+                onClick={() => openDrawer(Aluno)}
               />,
               <Button
-                key={associado.id}
+                key={Aluno.id}
                 type="primary"
                 danger
                 icon={<FaTrash />}
-                onClick={() => deleteAssociado(associado.id!)}
+                onClick={() => deleteAluno(Aluno.id!)}
               />,
-              <Link key={associado.id} href={`/associados/${associado.id}`}>
+              <Link key={Aluno.id} href={`/Alunos/${Aluno.id}`}>
                 <Button type="link" icon={<FaInfo />} />
               </Link>
             ]}
           >
             <List.Item.Meta
-              title={associado.nome}
+              title={Aluno.nome}
               description={
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span>Documento:  {associado.documento}</span>
+                
                 <span>Tipo de caddasto: Cadastro via landingpage</span>
                 <span>Cursos: JavaScript Básico, HTML Básico, Python</span>
                 <span>Treinamentos: Nenhum</span>
-                <span>Status: { associado.status == false ? <span className='bg-red-100 p-1 rounded-md text-red-600 '>Inativo</span> : <span className='bg-green-100 p-1 rounded-md text-green-600 '>Ativo</span>}</span>
+                <span>Status: { Aluno.ativo == false ? <span className='bg-red-100 p-1 rounded-md text-red-600 '>Inativo</span> : <span className='bg-green-100 p-1 rounded-md text-green-600 '>Ativo</span>}</span>
               </div>  
               }
               
@@ -246,7 +215,7 @@ const AssociadoManagement = () => {
       />
 
       <Drawer
-        title={isEditing ? 'Editar Associado' : 'Adicionar Associado'}
+        title={isEditing ? 'Editar Aluno' : 'Adicionar Aluno'}
         width='80%'
         onClose={closeDrawer}
         visible={drawerVisible}
@@ -261,7 +230,7 @@ const AssociadoManagement = () => {
               onClick={() => {
                 form
                   .validateFields()
-                  .then(values => saveAssociado(values))
+                  .then(values => saveAluno(values))
                   .catch(info => {
                     notification.error({
                       message: 'Erro ao validar formulário',
@@ -280,10 +249,10 @@ const AssociadoManagement = () => {
           maxWidth: '100%',
         }}
       >
-        <AssociadoForm onFinish={saveAssociado} form={form} empresas={empresas} initialValues={currentAssociado} />
+        <AlunoForm onFinish={saveAluno} form={form} initialValues={currentAluno} />
       </Drawer>
     </div>
   );
 };
 
-export default AssociadoManagement;
+export default AlunoManagement;
