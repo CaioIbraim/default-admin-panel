@@ -6,5 +6,6 @@
     dataCadastro: Date;
     ativo: boolean; // para controle de status
     atualizadoEm: Date;
+    image_url: string;  
   }
   

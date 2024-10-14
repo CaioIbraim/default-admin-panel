@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { Form, Input, DatePicker, Select, Checkbox, Tabs, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
 import { supabase } from '../../lib/supabaseClient';
-import { Empresa } from '../types/Empresa';
 import { Aluno } from '../types/Aluno';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br'; // Importa a localidade para o formato brasileiro
 
 // Configura o dayjs para usar o locale brasileiro
@@ -24,25 +23,40 @@ interface AlunoFormProps {
   onFinish: (values: AlunoFormValues) => void; // Função para lidar com a submissão
 }
 
-const AlunoForm: React.FC<AlunoFormProps> = ({ form,  initialValues, onFinish }) => {
+const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null); // Estado para armazenar o nome da imagem
-  const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null); // Estado para armazenar o nome da imagem
+  const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null); // Estado para armazenar o caminho da imagem
 
+  // Função para gerar um nome de arquivo aleatório
+  const generateRandomFileName = (originalName: string) => {
+    const extension = originalName.split('.').pop();
+    const randomName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${randomName}.${extension}`;
+  };
 
-  // Função para converter Date para Dayjs
-  const convertToDayjs = (date: Date | undefined): Dayjs | undefined => {
-    return date ? dayjs(date) : undefined;
+  // Função para deletar a imagem anterior
+  const deletePreviousImage = async (imageUrl: string) => {
+    const path = imageUrl.split('/storage/v1/object/public/')[1]; // Extrai o caminho do arquivo
+    const { error } = await supabase.storage.from('bucket').remove([path]);
+    if (error) {
+      console.error('Error deleting file:', error);
+      alert('Erro ao deletar a imagem anterior.');
+    }
   };
 
   // Função para fazer o upload da imagem
   const uploadImage = async (file: File) => {
     try {
-      // Faz o upload da imagem para o bucket 'associados'
+      if (initialValues?.image_url) {
+        await deletePreviousImage(initialValues.image_url); // Deleta a imagem anterior, se existir
+      }
+
+      const randomFileName = generateRandomFileName(file.name); // Gera um nome aleatório
       const { data, error } = await supabase.storage
         .from('bucket') // Nome do bucket que você criou no Supabase
-        .upload(`public/${file.name}`, file, {
+        .upload(`public/${randomFileName}`, file, {
           cacheControl: '3600',
-          upsert: false, // Se quiser sobrescrever arquivos existentes
+          upsert: false,
         });
 
       if (error) {
@@ -51,9 +65,11 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form,  initialValues, onFinish })
 
       console.log('File uploaded:', data.fullPath);
 
-      setUploadedImagePath(process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/bucket/public/'+uploadedImage)
-      setUploadedImage(file.name); // Armazena o nome da imagem
-      form.setFieldsValue({ foto: file.name }); // Atualiza o campo foto no formulário
+      const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`;
+      setUploadedImagePath(imageUrl);
+      setUploadedImage(randomFileName); // Armazena o nome aleatório da imagem
+      
+      form.setFieldsValue({ image_url: imageUrl }); // Atualiza o campo image_url no formulário
       return data; // Retorna os dados da resposta
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -64,119 +80,105 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form,  initialValues, onFinish })
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log(file)
+    if (file) {
+      await uploadImage(file); // Faz o upload da imagem assim que um arquivo é selecionado
+    }
   };
 
-  // Define o valor inicial do campo filhos para controle do campo quantos_filhos
-  const filhosValue = form.getFieldValue('filhos');
+  useEffect(() => {
+    // Limpa o estado de imagem ao carregar o formulário
+    if (initialValues) {
+      setUploadedImage(null);
+      setUploadedImagePath(null);
+    }
+  }, [initialValues]);
 
   return (
     <Form
-    form={form}
-    layout="vertical"
-    name="Aluno_form"
-    initialValues={{
-      ...initialValues,
-      
-    }}
-    onFinish={onFinish}
-  >
-    <Tabs defaultActiveKey="1">
-      <TabPane tab="Informações Pessoais" key="1">
-        <Form.Item
-          name="status"
-          label="Status"
-          rules={[{ required: true, message: 'Por favor, selecione um status!' }]}
-        >
-          <Select>
-            {statusOptions.map(status => (
-              <Select.Option key={status.nome} value={status.id}>
-                {status.nome}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-  
-        <Form.Item
-          name="nome"
-          label="Nome"
-          rules={[{ required: true, message: 'Por favor, insira o nome!' }]}
-        >
-          <Input />
-        </Form.Item>
-  
-        <Form.Item
-          name="documento"
-          label="Documento"
-          rules={[{ required: true, message: 'Por favor, insira o documento!' }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item name="endereco" label="Endereço">
-          <Input />
-        </Form.Item>
-        
-        <Form.Item name="naturalidade" label="Naturalidade">
-          <Input />
-        </Form.Item>
-        <Form.Item name="estado_civil" label="Estado Civil">
-          <Input />
-        </Form.Item>
-        <Form.Item name="nome_pai" label="Nome do Pai">
-          <Input />
-        </Form.Item>
-        <Form.Item name="nome_mae" label="Nome da Mãe">
-          <Input />
-        </Form.Item>
-        <Form.Item name="titulo_eleitor" label="Título de Eleitor">
-          <Input />
-        </Form.Item>
-      </TabPane>
-      
-
-      <TabPane tab="Upload de Imagem" key="4">
-  <Form.Item label="Foto">
-    <Input 
-      type="file" 
-      accept="image/*" 
-      onChange={handleFileChange} 
-      style={{ marginBottom: 16 }} 
-    />
-    {uploadedImage && (
-      <div style={{ marginBottom: 16 }}>
-        <p>Imagem enviada: {uploadedImage}</p>
-        
-        <img 
-          src={uploadedImagePath!} 
-          alt="Preview" 
-          style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8 }} 
-        />
-      </div>
-    )}
-  </Form.Item>
-  <Form.Item>
-    
-    <Button 
-      type="primary" 
-      onClick={async () => {
-        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-        if (fileInput?.files?.length) {
-          await uploadImage(fileInput.files[0]);
-        } else {
-          alert("Por favor, selecione uma imagem antes de enviar.");
-        }
+      form={form}
+      layout="vertical"
+      name="Aluno_form"
+      initialValues={{
+        ...initialValues,
       }}
+      onFinish={onFinish}
     >
-      Enviar Imagem
-    </Button>
-  </Form.Item>
-</TabPane>
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Informações Pessoais" key="1">
+          <Form.Item
+            name="ativo"
+            label="Status"
+            rules={[{ required: true, message: 'Por favor, selecione um status!' }]}
+          >
+            <Select>
+              {statusOptions.map(status => (
+                <Select.Option key={status.nome} value={status.id}>
+                  {status.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
 
+          <Form.Item
+            name="nome"
+            label="Nome"
+            rules={[{ required: true, message: 'Por favor, insira o nome!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-    </Tabs>
-    
-  </Form>
-  
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: 'Por favor, insira o email!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="image_url"
+            rules={[{ required: true, message: 'A imagem é obrigatória!' }]}
+          >
+            <Input type="hidden" />
+          </Form.Item>
+        </TabPane>
+
+        <TabPane tab="Upload de Imagem" key="4">
+          <Form.Item label="Foto">
+            <div style={{ border: '2px dashed #ccc', borderRadius: 8, padding: 16, textAlign: 'center', marginBottom: 16 }}>
+              {uploadedImage ? (
+                <div style={{ marginBottom: 16 }}>
+                  <img 
+                    src={uploadedImagePath!} 
+                    alt="Preview" 
+                    style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, transition: 'transform 0.2s' }} 
+                    onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+                    onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                  />
+                </div>
+              ) : (
+                <div style={{ marginBottom: 16 }}>
+                  <img 
+                    src={initialValues?.image_url} 
+                    alt="Preview" 
+                    style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, transition: 'transform 0.2s' }} 
+                    onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+                    onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                  />
+                </div>
+              )}
+              <p style={{ margin: '8px 0', color: '#666' }}>Selecione uma imagem para fazer upload (PNG, JPG)</p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileChange} 
+                style={{ display: 'block', margin: '0 auto' }} 
+              />
+            </div>
+          </Form.Item>
+        </TabPane>
+      </Tabs>
+    </Form>
   );
 };
 

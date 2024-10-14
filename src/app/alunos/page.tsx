@@ -54,14 +54,16 @@ const AlunoManagement = () => {
       const Aluno = { ...values, id: currentAluno?.id };
       
       const { data, error } = await supabase
-        .from('Alunos')
+        .from('alunos')
         .select('*')
         .eq('id', Aluno.id);
 
-      if (data?.length !== 0) {
+      
+
+      if (data?.length !== 0 && data?.length !== undefined)  {
         // Realizar update
         const { error } = await supabase
-          .from('Alunos')
+          .from('alunos')
           .update(Aluno)
           .eq('id', Aluno.id);
 
@@ -73,8 +75,11 @@ const AlunoManagement = () => {
         });
       } else {
         // Inserir
+        delete Aluno.id;
+        console.log([Aluno])
+
         const { error } = await supabase
-          .from('Alunos')
+          .from('alunos')
           .insert([Aluno]);
 
         if (error) throw error;
@@ -106,7 +111,7 @@ const AlunoManagement = () => {
       onOk: async () => {
         try {
           const { error } = await supabase
-            .from('Alunos')
+            .from('alunos')
             .delete()
             .eq('id', id);
 
@@ -127,11 +132,13 @@ const AlunoManagement = () => {
 
   const openDrawer = (Aluno?: Aluno) => {
     setCurrentAluno(Aluno! || {
+                        id : 0,
                         nome: '',
                         email: '',
                         dataCadastro: '',
                         ativo: '',
                         atualizadoEm: '',
+                        image_url: '',
     });
     setIsEditing(!!Aluno);
     form.setFieldsValue({
@@ -192,23 +199,21 @@ const AlunoManagement = () => {
             <List.Item.Meta
               title={
                 <div className='flex flex-row items-center space-x-2'>
-                <img src="https://yndxgfkgzscetrenkpjw.supabase.co/storage/v1/object/public/bucket/public/PhotoReal_Doublemasking_photography_a_powerful_African_woman_e_2.jpg" alt="" className='rounded-full w-10 h-10' />
-                <span>
-                  {Aluno.nome}
-                </span> 
-            </div>
-              
+                  <img src={Aluno.image_url} alt="" className='rounded-full w-10 h-10' />
+                  <span>
+                    {Aluno.nome}
+                  </span> 
+                </div>
               }
-        
         
               description={
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                
-                <span>Tipo de caddasto: Cadastro via landingpage</span>
-                <span>Cursos: JavaScript Básico, HTML Básico, Python</span>
-                <span>Treinamentos: Nenhum</span>
-                <span>Status: { Aluno.ativo == false ? <span className='bg-red-100 p-1 rounded-md text-red-600 '>Inativo</span> : <span className='bg-green-100 p-1 rounded-md text-green-600 '>Ativo</span>}</span>
-              </div>  
+                  <span>E-mail: {Aluno.email}</span>
+                  {/* <span>Tipo de caddasto: Cadastro via landingpage</span>
+                  <span>Cursos: JavaScript Básico, HTML Básico, Python</span>
+                  <span>Treinamentos: Nenhum</span> */}
+                  <span>Status: { Aluno.ativo == false ? <span className='bg-red-100 p-1 rounded-md text-red-600 '>Inativo</span> : <span className='bg-green-100 p-1 rounded-md text-green-600 '>Ativo</span>}</span>
+                </div>  
               }
               
             />
