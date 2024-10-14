@@ -126,7 +126,7 @@ const AlunoManagement = () => {
   };
 
   const openDrawer = (Aluno?: Aluno) => {
-    setCurrentAluno(Aluno || {
+    setCurrentAluno(Aluno! || {
                         nome: '',
                         email: '',
                         dataCadastro: '',
@@ -190,7 +190,17 @@ const AlunoManagement = () => {
             ]}
           >
             <List.Item.Meta
-              title={Aluno.nome}
+              title={
+                <div className='flex flex-row items-center space-x-2'>
+                <img src="https://yndxgfkgzscetrenkpjw.supabase.co/storage/v1/object/public/bucket/public/PhotoReal_Doublemasking_photography_a_powerful_African_woman_e_2.jpg" alt="" className='rounded-full w-10 h-10' />
+                <span>
+                  {Aluno.nome}
+                </span> 
+            </div>
+              
+              }
+        
+        
               description={
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                 
