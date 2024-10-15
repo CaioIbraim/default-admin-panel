@@ -191,7 +191,7 @@ const AlunoManagement = () => {
                 icon={<FaTrash />}
                 onClick={() => deleteAluno(Aluno.id!)}
               />,
-              <Link key={Aluno.id} href={`/Alunos/${Aluno.id}`}>
+              <Link key={Aluno.id} href={`/alunos/${Aluno.id}`}>
                 <Button type="link" icon={<FaInfo />} />
               </Link>
             ]}
