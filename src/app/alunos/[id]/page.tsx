@@ -152,9 +152,28 @@ const AlunoManagement = () => {
   ];
 
 
+
+  const columnsInscricao = [
+    { title: 'Matricula', dataIndex: 'data_pagamento', key: 'data_pagamento', render: (text: number) => `Pagamento realizado `  },
+    { title: 'Curso', dataIndex: 'data_pagamento', key: 'data_pagamento', render: (text: number) => `Pagamento realizado `  },
+    { title: 'Data da incrição', dataIndex: 'data_pagamento', key: 'data_pagamento', render: (text: Date) => new Date(text).toLocaleDateString() },
+    { title: 'Valor', dataIndex: 'valor_pago', key: 'valor_pago', render: (text: number) => `R$ ${text.toFixed(2)}` },
+    { title: 'Status', dataIndex: 'historico_pagamentos.0.motivo', key: 'historico_pagamentos.0.motivo', render: (text: string) => text  },
+    {
+      title: 'Ações',
+      key: 'actions',
+      render: (text: any, record: Pagamento) => (
+        <>
+          <Button type="link" danger onClick={() => deletePagamento(record.id!)}>Excluir Pagamento</Button>
+        </>
+      ),
+    },
+  ];
+
+
   return (
     <div className="mx-auto max-w-4xl p-4">
-      <Title level={1} className="text-center mb-5">Infromações do Aluno</Title>
+      <Title level={1} className="text-center mb-5">Informações do Aluno</Title>
 
       <Tabs defaultActiveKey="1">
         <TabPane tab="Dados do Aluno" key="1">
@@ -210,16 +229,16 @@ const AlunoManagement = () => {
                 className="mt-4"
               />
 
-                  <Table
-                    dataSource={[aluno]}
-                    columns={[
-                      { title: 'Data de Nascimento', dataIndex: 'data_de_nascimento', key: 'data_de_nascimento', render: (text: Date) => text ? new Date(text).toLocaleDateString() : 'Não informado' },
-                      
-                    ]}
-                    rowKey="id"
-                    pagination={false}
-                    className="mt-4"
-                  />
+              <Table
+                dataSource={[aluno]}
+                columns={[
+                  { title: 'Data de Nascimento', dataIndex: 'data_de_nascimento', key: 'data_de_nascimento', render: (text: Date) => text ? new Date(text).toLocaleDateString() : 'Não informado' },
+                  
+                ]}
+                rowKey="id"
+                pagination={false}
+                className="mt-4"
+              />
 
 
               <Table
@@ -267,6 +286,18 @@ const AlunoManagement = () => {
           />
         </TabPane>
 
+
+        <TabPane tab="Inscrições" key="3">
+          <Button type="primary" onClick={openPagamentoModal} className="mb-4">Realizar inscrição</Button>
+          <Table
+            dataSource={pagamentos}
+            columns={columnsInscricao}
+            rowKey="id"
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            className="mt-4"
+          />
+        </TabPane>
             
       </Tabs>
 
