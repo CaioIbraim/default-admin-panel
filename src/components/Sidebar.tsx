@@ -5,7 +5,7 @@ import { Menu, Layout, Button } from 'antd';
 import { FaSignOutAlt, FaHome, FaUsers, FaBusinessTime, FaMoneyBill, FaRProject, FaBook, FaUserCircle } from 'react-icons/fa';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import Image from 'next/image';
-import { FaBarsProgress, FaDiagramProject } from 'react-icons/fa6';
+import { FaBarsProgress, FaDiagramProject, FaGears, FaUpwork } from 'react-icons/fa6';
 
 const { Sider } = Layout;
 
@@ -28,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
     { icon: <FaHome />, path: 'inicio', label: 'Inicio' },
     { icon: <FaUsers />, path: 'alunos', label: 'Alunos' },
     { icon: <FaUserCircle />, path: 'profissionais', label: 'Profissionais' },
+    { icon: <FaGears />, path: 'servicos', label: 'Serviços' },
     { icon: <FaBook />, path: 'cursos', label: 'Cursos' },
     { icon: <FaDiagramProject />, path: 'projetos', label: 'Projetos' },
     { icon: <FaBarsProgress />, path: 'treinamentos', label: 'Treinamentos' },

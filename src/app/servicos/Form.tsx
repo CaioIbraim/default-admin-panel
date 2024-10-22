@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
 import { supabase } from '../../lib/supabaseClient';
-import { Profissional } from '../types/Profissional';
+import { Servicos } from '../types/Servicos';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br'; // Importa a localidade para o formato brasileiro
 
@@ -15,11 +15,11 @@ const statusOptions = [
   { id: false, nome: 'Inativo' }
 ];
 
-interface AlunoFormValues extends Profissional {}
+interface AlunoFormValues extends Servicos {}
 
 interface AlunoFormProps {
   form: any;
-  initialValues?: Profissional; // Tipo correto
+  initialValues?: Servicos; // Tipo correto
   onFinish: (values: AlunoFormValues) => void; // Função para lidar com a submissão
 }
 
@@ -105,19 +105,7 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
     >
       <Tabs defaultActiveKey="1">
         <TabPane tab="Informações Pessoais" key="1">
-          <Form.Item
-            name="ativo"
-            label="Status"
-            rules={[{ required: true, message: 'Por favor, selecione um status!' }]}
-          >
-            <Select>
-              {statusOptions.map(status => (
-                <Select.Option key={status.nome} value={status.id}>
-                  {status.nome}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+          
 
           <Form.Item
             name="nome"
@@ -127,10 +115,19 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
             <Input />
           </Form.Item>
 
+
           <Form.Item
-            name="email"
-            label="Email"
-            rules={[{ required: true, message: 'Por favor, insira o email!' }]}
+            name="preco"
+            label="Preço"
+            rules={[{ required: true, message: 'Por favor, insira o preço!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="descricao"
+            label="Descrição"
+            rules={[{ required: true, message: 'Por favor, insira a descrição!' }]}
           >
             <Input />
           </Form.Item>
@@ -139,7 +136,7 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
             name="imagem_url"
             rules={[{ required: true, message: 'A imagem é obrigatória!' }]}
           >
-            <Input  type="hidden"/>
+            <Input type="hidden" />
           </Form.Item>
         </TabPane>
 
