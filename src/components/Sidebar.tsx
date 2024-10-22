@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, Layout, Button } from 'antd';
-import { FaSignOutAlt, FaHome, FaUsers, FaBusinessTime, FaMoneyBill, FaRProject, FaBook } from 'react-icons/fa';
+import { FaSignOutAlt, FaHome, FaUsers, FaBusinessTime, FaMoneyBill, FaRProject, FaBook, FaUserCircle } from 'react-icons/fa';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import { FaBarsProgress, FaDiagramProject } from 'react-icons/fa6';
@@ -27,12 +27,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
   const navItems = [
     { icon: <FaHome />, path: 'inicio', label: 'Inicio' },
     { icon: <FaUsers />, path: 'alunos', label: 'Alunos' },
+    { icon: <FaUserCircle />, path: 'profissionais', label: 'Profissionais' },
     { icon: <FaBook />, path: 'cursos', label: 'Cursos' },
     { icon: <FaDiagramProject />, path: 'projetos', label: 'Projetos' },
     { icon: <FaBarsProgress />, path: 'treinamentos', label: 'Treinamentos' },
     { icon: <FaBusinessTime />, path: 'empresas', label: 'Empresas' },
     { icon: <FaMoneyBill />, path: 'pagamentos', label: 'Pagamentos' },
-    { icon: <FaMoneyBill />, path: 'testes', label: 'Testes' },
+    
   ];
 
   return (
