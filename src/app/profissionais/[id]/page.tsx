@@ -1,15 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Modal, Table, Input, notification, Typography, Tabs, Card, Select } from 'antd';
+import { DatePicker, Button, Modal, Table, Input, notification, Typography, Tabs, Card, Select, Form } from 'antd';
+import moment, { Moment } from 'moment';
+import 'moment/locale/pt-br';
 import { useParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { Profissional } from '../../types/Profissional'
 import { Agendamento } from '../../types/Agendamento'
+import { Servicos } from '../../types/Servicos'
+import { FaEraser, FaPen, FaTrash } from 'react-icons/fa';
 const { Title } = Typography;
 const { TabPane } = Tabs;
-
-
+moment.locale('pt-BR');
 
 interface Pagamento {
   id?: string;
@@ -23,22 +26,37 @@ interface Pagamento {
 }
 
 
-
 const ProfissionalManagement = () => {
+  const [form] = Form.useForm();
+
   const { id } = useParams<{ id: string }>();
   const [aluno, setProfissional] = useState<Profissional | null>(null);
   const [pagamentos, setPagamentos] = useState<Pagamento[]>([]);
+  const [servicos, setServicos] = useState<Servicos[]>([]);
   const [agendamento, setAgendamento] = useState<Agendamento[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentPagamento, setCurrentPagamento] = useState<Pagamento | null>(null);
+  const [currentAgendamento, setCurrentAgendamento] = useState<Agendamento | null>(null);
   const [dependenteModalVisible, setDependenteModalVisible] = useState(false);
-  
+  const [agendamentoModalVisible, setAgendamentoModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchProfissional = async () => {
     if (id) {
       const { data, error } = await supabase.from('profissionais').select('*').eq('id', id).single();
       if (data) {
         setProfissional(data);
+      } else if (error) {
+        console.error('Erro ao buscar aluno:', error.message);
+      }
+    }
+  };
+
+  const fetchServicos = async () => {
+    if (id) {
+      const { data, error } = await supabase.from('servicos').select('*');
+      if (data) {
+        setServicos(data);
       } else if (error) {
         console.error('Erro ao buscar aluno:', error.message);
       }
@@ -56,7 +74,6 @@ const ProfissionalManagement = () => {
     }
   };
 
-
   const fetchAgendamento = async () => {
     if (id) {
       const { data, error } = await supabase.from('agendamentos').select('*, servicos ( * )' ).eq('profissional_id', id);
@@ -72,6 +89,7 @@ const ProfissionalManagement = () => {
     fetchProfissional();
     fetchPagamentos();
     fetchAgendamento();
+    fetchServicos();
   }, [id]);
 
   const openPagamentoModal = () => {
@@ -88,9 +106,25 @@ const ProfissionalManagement = () => {
     setModalVisible(true);
   };
 
-  const closePagamentoModal = () => {
-    setModalVisible(false);
+  const openAgendamentoModal = (Agendamento?: Agendamento) => {
+    setCurrentAgendamento(Agendamento! || {
+      id: 0, // or some default value if necessary
+      profissional_id: Number(id), // Convert to number
+      servico_id: 0, // ID do serviço
+      cliente_nome: '', // Nome do cliente
+      cliente_email: '', // Email do cliente
+      cliente_celular: '', // Celular do cliente
+      data_hora: new Date(), // Data e hora do agendamento
+      data_criacao: new Date(), // Include creation date if required
+      status: 'agendado', // Status do agendamento
+    });
+    setIsEditing(!!Agendamento);
+    form.setFieldsValue({
+      ...Agendamento,
+    });
+    setAgendamentoModalVisible(true);
   };
+  
 
   const savePagamento = async () => {
     if (currentPagamento) {
@@ -127,6 +161,44 @@ const ProfissionalManagement = () => {
     }
   };
 
+  const saveAgendamento = async () => {
+   
+    if (currentAgendamento) {
+      try {
+        const { id, ...agendamentoData } = currentAgendamento;
+   
+        console.log(id)
+        
+        const { data, error: fetchError } = await supabase
+          .from('agendamentos')
+          .select('id')
+          .eq('id', id);
+          
+        if (data?.length === 0 || id === 0) {
+          await supabase
+            .from('agendamentos')
+            .insert([{ ...agendamentoData }]);
+        } else {
+
+          delete agendamentoData.servicos
+          await supabase
+            .from('agendamentos')
+            .update(agendamentoData)
+            .eq('id', id);
+        }
+        
+        notification.success({
+          message: 'Agendamento Salvo',
+          description: 'Agendamento foi salvo com sucesso.',
+        });
+        closeAgendamentoModal();
+        fetchAgendamento();
+      } catch (error) {
+        console.error('Erro ao salvar agemdamento:', (error as Error).message);
+      }
+    }
+  };
+
   const deletePagamento = async (id: string) => {
     try {
       const { error } = await supabase.from('pagamentos').delete().eq('id', id);
@@ -142,11 +214,47 @@ const ProfissionalManagement = () => {
     }
   };
 
-  
-  const closeDependenteModal = () => {
-    setDependenteModalVisible(false);
+  const deleteAgendamento = async (id: number) => {
+    Modal.confirm({
+      title: 'Confirmar Exclusão',
+      content: 'Você tem certeza que deseja excluir este Agendamento?',
+      okText: 'Sim',
+      okType: 'danger',
+      cancelText: 'Não',
+      onOk: async () => {
+        try {
+          const { error } = await supabase
+            .from('agendamentos')
+            .delete()
+            .eq('id', id);
+
+          if (error) throw error;
+
+          fetchAgendamento();
+
+          notification.success({
+            message: 'Agendamento Excluído',
+            description: 'Agendamento excluído com sucesso.',
+          });
+        } catch (error) {
+          console.error('Erro ao excluir Agendamento:', (error as Error).message);
+        }
+      },
+    });
   };
 
+
+  const closePagamentoModal = () => {
+    setModalVisible(false);
+  };
+
+  const closeAgendamentoModal = () => {
+    setAgendamentoModalVisible(false);
+  };
+
+
+
+ 
 
   const columns = [
     { title: 'Valor', dataIndex: 'valor_pago', key: 'valor_pago', render: (text: number) => `R$ ${text.toFixed(2)}` },
@@ -186,17 +294,31 @@ const ProfissionalManagement = () => {
 
 
   const columnsAgenda = [
-    { title: 'Serviço', dataIndex: 'servico_id', key: 'servico_id' , render: (text: string) => text },
-    { title: 'Serviço', dataIndex: 'servicos', key: 'servicos' , render: (text: Object) => text.nome },
+    { title: 'Imagem', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => <img src={`${text.imagem_url}`} className="rounded-full w-12"/> },
+    { title: 'Serviço', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.nome },
+    { title: 'Valor', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.preco },
     { title: 'Cliente', dataIndex: 'cliente_nome', key: 'cliente_nome'},
+    { title: 'Contato do cliente', dataIndex: 'cliente_celular', key: 'cliente_celular'},
     { title: 'Data e hora', dataIndex: 'data_hora', key: 'data_hora', render: (text: Date) => new Date(text).toLocaleDateString() },
     { title: 'Status', dataIndex: 'status', key: 'status', render: (text: string) => text  },
     {
       title: 'Ações',
       key: 'actions',
-      render: (text: any, record: Pagamento) => (
+      render: (text: any, record: Agendamento) => (
         <>
-          <Button type="link" danger onClick={() => deletePagamento(record.id!)}>Excluir Agendamento</Button>
+          <Button
+                key={record.id}
+                type="primary"
+                danger
+                icon={<FaTrash />}
+                onClick={() => deleteAgendamento(record.id!)}
+              />
+          <Button
+                key={record.id}
+                type="primary"
+                icon={<FaPen />}
+                onClick={() => openAgendamentoModal(record)}
+              />
         </>
       ),
     },
@@ -216,7 +338,7 @@ const ProfissionalManagement = () => {
               <Table
                 dataSource={[aluno]}
                 columns={[
-                  { title: 'Foto', dataIndex: 'imagem_url', key: 'imagem_url', render: (text: Date) => text ? <img src={`${text}`} className="rounded-full w-1/2"/> : <img src={`${text}`} className="rounded-full w-1/2"/> },
+                  { title: 'Foto', dataIndex: 'imagem_url', key: 'imagem_url', render: (text: Date) => text ? <img src={`${text}`} className="rounded-full w-32 h-32"/> : <img src={`${text}`} className="rounded-full w-32  h-32"/> },
                 ]}
                 rowKey="id"
                 pagination={false}
@@ -301,7 +423,7 @@ const ProfissionalManagement = () => {
               
             </>
           ) : (
-            <p>Carregando aluno...</p>
+            <p>Carregando profissional...</p>
           )}
         </TabPane>
 
@@ -321,7 +443,7 @@ const ProfissionalManagement = () => {
 
 
         <TabPane tab="Agendamento" key="3">
-          <Button type="primary" onClick={openPagamentoModal} className="mb-4">Agendar</Button>
+          <Button type="primary" onClick={() => openAgendamentoModal()} className="mb-4">Agendar</Button>
           <Table
             dataSource={agendamento}
             columns={columnsAgenda}
@@ -393,6 +515,93 @@ const ProfissionalManagement = () => {
 
       </Modal>
 
+
+
+
+      <Modal
+        title="Agendar Serviço"
+        visible={agendamentoModalVisible}
+        onOk={saveAgendamento}
+        onCancel={closeAgendamentoModal}
+        footer={[
+          <Button key="cancel" onClick={closeAgendamentoModal}>Cancelar</Button>,
+          <Button key="submit" type="primary" onClick={saveAgendamento}>Agendar</Button>,
+        ]}
+      >
+
+      <div>
+
+
+
+
+      
+<div className="mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
+  <DatePicker
+    showTime
+    value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
+    placeholder="Selecione a data e hora"
+    format="DD/MM/YYYY HH:mm"
+    className="w-full"
+  />
+</div>
+
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Nome do cliente</label>
+        <Input
+          type="text"
+          value={currentAgendamento?.cliente_nome}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_nome: e.target.value }))}
+          placeholder="Digite o nome do cliente"
+        />
+      </div>
+
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">E-mail do cliente</label>
+        <Input
+          type="email"
+          value={currentAgendamento?.cliente_email}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_email: e.target.value }))}
+          placeholder="Digite o e-mail do cliente"
+        />
+      </div>
+
+      
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Celular do cliente</label>
+        <Input
+          type="email"
+          value={currentAgendamento?.cliente_celular}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_celular: e.target.value }))}
+          placeholder="Digite o celular do cliente"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Selecione o Serviço</label>
+        <select
+          value={currentAgendamento?.servico_id}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, servico_id: Number(e.target.value) }))}
+          className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:ring-blue-200"
+        >
+          <option value={0}>Selecione um serviço</option>
+          {servicos.map((servico) => (
+            <option key={servico.id} value={servico.id}>
+              {servico.nome}
+            </option>
+          ))}
+        </select>
+      </div>
+
+     
+     
+    </div>
+
+
+
+      </Modal>
      
     </div>
   );
