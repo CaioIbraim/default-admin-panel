@@ -38,11 +38,15 @@ const ProfissionalManagement = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentPagamento, setCurrentPagamento] = useState<Pagamento | null>(null);
   const [currentAgendamento, setCurrentAgendamento] = useState<Agendamento | null>(null);
+  const [currentProfissionaisServicos, setCurrentProfissionaisServicos] = useState<ProfissionaisServicos | null>(null);
+  
   const [dependenteModalVisible, setDependenteModalVisible] = useState(false);
   const [agendamentoModalVisible, setAgendamentoModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profissionalServicos, setProfissionalServicos] = useState<ProfissionaisServicos[]>([]);
   const [profissionalServicoModalVisible,setProfissionalServicoModalVisible] = useState(false);
+
+  
 
   const fetchProfissional = async () => {
     if (id) {
@@ -100,7 +104,7 @@ const ProfissionalManagement = () => {
     setCurrentPagamento({
       id: crypto.randomUUID(),
       aluno_id: id!,
-      plano_id: "d8c447ea-c11a-45e6-9339-6f9f7cb6925b",
+      plano_id: "",
       valor_pago: 0,
       forma_pagamento: "cartão",
       status: "pendente",
@@ -127,6 +131,20 @@ const ProfissionalManagement = () => {
       ...Agendamento,
     });
     setAgendamentoModalVisible(true);
+  };
+
+
+  const openServicoModal = (ProfissionaisServicos?: ProfissionaisServicos) => {
+    setCurrentProfissionaisServicos(ProfissionaisServicos! || {
+      profissional_id: Number(id), // Convert to number
+      servico_id: 0, // ID do serviço
+      preco : Number(0)
+    });
+    setIsEditing(!!ProfissionaisServicos);
+    form.setFieldsValue({
+      ...ProfissionaisServicos,
+    });
+    setProfissionalServicoModalVisible(true);
   };
   
 
@@ -204,41 +222,19 @@ const ProfissionalManagement = () => {
   };
 
   const saveServico = async () => {
-   
-    if (currentAgendamento) {
       try {
-        const { id, ...agendamentoData } = currentAgendamento;
-   
-        console.log(id)
-        
-        const { data, error: fetchError } = await supabase
-          .from('agendamentos')
-          .select('id')
-          .eq('id', id);
-          
-        if (data?.length === 0 || id === 0) {
           await supabase
-            .from('agendamentos')
-            .insert([{ ...agendamentoData }]);
-        } else {
-
-          delete agendamentoData.servicos
-          await supabase
-            .from('agendamentos')
-            .update(agendamentoData)
-            .eq('id', id);
-        }
-        
+            .from('profissionais_servicos')
+            .insert([{ ...currentProfissionaisServicos }]);
         notification.success({
-          message: 'Agendamento Salvo',
-          description: 'Agendamento foi salvo com sucesso.',
+          message: 'Serviço adicionado',
+          description: 'Serviço foi salvo com sucesso.',
         });
-        closeAgendamentoModal();
-        fetchAgendamento();
+        closeprofissionalServicoModal();
+        fetchProfissional();
       } catch (error) {
-        console.error('Erro ao salvar agemdamento:', (error as Error).message);
+        console.error('Erro ao salvar serviço:', (error as Error).message);
       }
-    }
   };
 
   const deletePagamento = async (id: string) => {
@@ -285,6 +281,34 @@ const ProfissionalManagement = () => {
     });
   };
 
+  const deleteServico = async (id: number) => {
+    Modal.confirm({
+      title: 'Confirmar Exclusão',
+      content: 'Você tem certeza que deseja excluir este serviço?',
+      okText: 'Sim',
+      okType: 'danger',
+      cancelText: 'Não',
+      onOk: async () => {
+        try {
+          const { error } = await supabase
+            .from('profissionais_servicos')
+            .delete()
+            .eq('id', id);
+
+          if (error) throw error;
+
+          fetchProfissional();
+
+          notification.success({
+            message: 'Serviço Excluído',
+            description: 'Serviço excluído com sucesso.',
+          });
+        } catch (error) {
+          console.error('Erro ao excluir Serviço:', (error as Error).message);
+        }
+      },
+    });
+  };
 
   const closePagamentoModal = () => {
     setModalVisible(false);
@@ -365,18 +389,18 @@ const ProfissionalManagement = () => {
   const columnsServicosPrestados = [
     { title: 'Imagem', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => <img src={`${text.imagem_url}`} className="rounded-full w-12"/> },
     { title: 'Serviço', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.nome },
-    { title: 'Valor', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.preco },
+    { title: 'Valor', dataIndex: 'preco', key: 'preco' , render: (text: any) => text },
     {
       title: 'Ações',
       key: 'actions',
-      render: (text: any, record: any) => (
+      render: (text: any, record: ProfissionaisServicos) => (
         <>
           <Button
                 key={record.id}
                 type="primary"
                 danger
                 icon={<FaTrash />}
-                onClick={() => deleteAgendamento(record.id!)}
+                onClick={() => deleteServico(record.id!)}
               />
           
         </>
@@ -540,7 +564,7 @@ const ProfissionalManagement = () => {
         </TabPane>
 
         <TabPane tab="Serviços prestados" key="6">
-          <Button type="primary" onClick={openPagamentoModal} className="mb-4">Lançar serviços</Button>
+          <Button type="primary" onClick={() => openServicoModal() } className="mb-4">Lançar serviços</Button>
           <Table
             dataSource={profissionalServicos}
             columns={columnsServicosPrestados}
@@ -605,17 +629,17 @@ const ProfissionalManagement = () => {
 
 
 
-      
-<div className="mb-4">
-  <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
-  <DatePicker
-    showTime
-    value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
-    placeholder="Selecione a data e hora"
-    format="DD/MM/YYYY HH:mm"
-    className="w-full"
-  />
-</div>
+              
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
+          <DatePicker
+            showTime
+            value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
+            placeholder="Selecione a data e hora"
+            format="DD/MM/YYYY HH:mm"
+            className="w-full"
+          />
+        </div>
 
 
       <div className="mb-4">
@@ -674,7 +698,6 @@ const ProfissionalManagement = () => {
 
       </Modal>
 
-
       <Modal
         title="Adicionar Serviço"
         visible={profissionalServicoModalVisible}
@@ -686,75 +709,38 @@ const ProfissionalManagement = () => {
         ]}
       >
 
-      <div>
+        <div>
+             
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Selecione o Serviço</label>
+                <select
+                  value={currentProfissionaisServicos?.servico_id}
+                  onChange={(e) => setCurrentProfissionaisServicos((prev) => ({ ...prev!, servico_id: Number(e.target.value) }))}
+                  className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                  <option value={0}>Selecione um serviço</option>
+                  {servicos.map((servico) => (
+                    <option key={servico.id} value={servico.id}>
+                      {servico.nome} -  preço médio : {servico.preco}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
 
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Preço</label>
+                <Input
+                  type="number"
+                  value={currentProfissionaisServicos?.preco}
+                  onChange={(e) => setCurrentProfissionaisServicos((prev) => ({ ...prev!, preco : Number(e.target.value) }))}
+                  placeholder="Digite o seu preço para o serviço"
+                />
+              </div>
 
-
+            
       
-<div className="mb-4">
-  <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
-  <DatePicker
-    showTime
-    value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
-    placeholder="Selecione a data e hora"
-    format="DD/MM/YYYY HH:mm"
-    className="w-full"
-  />
-</div>
-
-
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Nome do cliente</label>
-        <Input
-          type="text"
-          value={currentAgendamento?.cliente_nome}
-          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_nome: e.target.value }))}
-          placeholder="Digite o nome do cliente"
-        />
-      </div>
-
-
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">E-mail do cliente</label>
-        <Input
-          type="email"
-          value={currentAgendamento?.cliente_email}
-          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_email: e.target.value }))}
-          placeholder="Digite o e-mail do cliente"
-        />
-      </div>
-
-      
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Celular do cliente</label>
-        <Input
-          type="email"
-          value={currentAgendamento?.cliente_celular}
-          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_celular: e.target.value }))}
-          placeholder="Digite o celular do cliente"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Selecione o Serviço</label>
-        <select
-          value={currentAgendamento?.servico_id}
-          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, servico_id: Number(e.target.value) }))}
-          className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:ring-blue-200"
-        >
-          <option value={0}>Selecione um serviço</option>
-          {servicos.map((servico) => (
-            <option key={servico.id} value={servico.id}>
-              {servico.nome}
-            </option>
-          ))}
-        </select>
-      </div>
-
-     
-     
-    </div>
+        </div>
 
 
 
