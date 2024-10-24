@@ -6,4 +6,5 @@ export  interface Profissional {
     telefone?: string;
     imagem_url?: string; // imagem_url
     data_criacao: string; // TIMESTAMP
+    tipo_profissional_id: number;
 }

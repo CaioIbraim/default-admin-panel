@@ -5,9 +5,10 @@ import { DatePicker, Button, Modal, Table, Input, notification, Typography, Tabs
 import moment, { Moment } from 'moment';
 import 'moment/locale/pt-br';
 import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '../../../lib/supabaseClient'
 import { Profissional } from '../../types/Profissional'
 import { Agendamento } from '../../types/Agendamento'
+import { ProfissionaisServicos } from '@/app/types/ProfissionaisServicos';
 import { Servicos } from '../../types/Servicos'
 import { FaEraser, FaPen, FaTrash } from 'react-icons/fa';
 const { Title } = Typography;
@@ -40,12 +41,15 @@ const ProfissionalManagement = () => {
   const [dependenteModalVisible, setDependenteModalVisible] = useState(false);
   const [agendamentoModalVisible, setAgendamentoModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [profissionalServicos, setProfissionalServicos] = useState<ProfissionaisServicos[]>([]);
+  const [profissionalServicoModalVisible,setProfissionalServicoModalVisible] = useState(false);
 
   const fetchProfissional = async () => {
     if (id) {
-      const { data, error } = await supabase.from('profissionais').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('profissionais').select('*, profissionais_servicos(*, servicos (*))').eq('id', id).single();
       if (data) {
         setProfissional(data);
+        setProfissionalServicos(data.profissionais_servicos)
       } else if (error) {
         console.error('Erro ao buscar aluno:', error.message);
       }
@@ -199,6 +203,44 @@ const ProfissionalManagement = () => {
     }
   };
 
+  const saveServico = async () => {
+   
+    if (currentAgendamento) {
+      try {
+        const { id, ...agendamentoData } = currentAgendamento;
+   
+        console.log(id)
+        
+        const { data, error: fetchError } = await supabase
+          .from('agendamentos')
+          .select('id')
+          .eq('id', id);
+          
+        if (data?.length === 0 || id === 0) {
+          await supabase
+            .from('agendamentos')
+            .insert([{ ...agendamentoData }]);
+        } else {
+
+          delete agendamentoData.servicos
+          await supabase
+            .from('agendamentos')
+            .update(agendamentoData)
+            .eq('id', id);
+        }
+        
+        notification.success({
+          message: 'Agendamento Salvo',
+          description: 'Agendamento foi salvo com sucesso.',
+        });
+        closeAgendamentoModal();
+        fetchAgendamento();
+      } catch (error) {
+        console.error('Erro ao salvar agemdamento:', (error as Error).message);
+      }
+    }
+  };
+
   const deletePagamento = async (id: string) => {
     try {
       const { error } = await supabase.from('pagamentos').delete().eq('id', id);
@@ -252,9 +294,9 @@ const ProfissionalManagement = () => {
     setAgendamentoModalVisible(false);
   };
 
-
-
- 
+  const closeprofissionalServicoModal = () => {
+    setProfissionalServicoModalVisible(false);
+  };
 
   const columns = [
     { title: 'Valor', dataIndex: 'valor_pago', key: 'valor_pago', render: (text: number) => `R$ ${text.toFixed(2)}` },
@@ -272,8 +314,6 @@ const ProfissionalManagement = () => {
     },
   ];
 
-
-
   const columnsInscricao = [
     { title: 'Matricula', dataIndex: 'data_pagamento', key: 'data_pagamento', render: (text: number) => `Pagamento realizado `  },
     { title: 'Curso', dataIndex: 'data_pagamento', key: 'data_pagamento', render: (text: number) => `Pagamento realizado `  },
@@ -290,8 +330,6 @@ const ProfissionalManagement = () => {
       ),
     },
   ];
-
-
 
   const columnsAgenda = [
     { title: 'Imagem', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => <img src={`${text.imagem_url}`} className="rounded-full w-12"/> },
@@ -319,6 +357,28 @@ const ProfissionalManagement = () => {
                 icon={<FaPen />}
                 onClick={() => openAgendamentoModal(record)}
               />
+        </>
+      ),
+    },
+  ];
+
+  const columnsServicosPrestados = [
+    { title: 'Imagem', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => <img src={`${text.imagem_url}`} className="rounded-full w-12"/> },
+    { title: 'Serviço', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.nome },
+    { title: 'Valor', dataIndex: 'servicos', key: 'servicos' , render: (text: Servicos) => text.preco },
+    {
+      title: 'Ações',
+      key: 'actions',
+      render: (text: any, record: any) => (
+        <>
+          <Button
+                key={record.id}
+                type="primary"
+                danger
+                icon={<FaTrash />}
+                onClick={() => deleteAgendamento(record.id!)}
+              />
+          
         </>
       ),
     },
@@ -478,7 +538,21 @@ const ProfissionalManagement = () => {
             className="mt-4"
           />
         </TabPane>
-            
+
+        <TabPane tab="Serviços prestados" key="6">
+          <Button type="primary" onClick={openPagamentoModal} className="mb-4">Lançar serviços</Button>
+          <Table
+            dataSource={profissionalServicos}
+            columns={columnsServicosPrestados}
+            rowKey="id"
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            className="mt-4"
+          />
+        </TabPane>
+      
+
+
       </Tabs>
 
       <Modal
@@ -515,9 +589,6 @@ const ProfissionalManagement = () => {
 
       </Modal>
 
-
-
-
       <Modal
         title="Agendar Serviço"
         visible={agendamentoModalVisible}
@@ -526,6 +597,92 @@ const ProfissionalManagement = () => {
         footer={[
           <Button key="cancel" onClick={closeAgendamentoModal}>Cancelar</Button>,
           <Button key="submit" type="primary" onClick={saveAgendamento}>Agendar</Button>,
+        ]}
+      >
+
+      <div>
+
+
+
+
+      
+<div className="mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
+  <DatePicker
+    showTime
+    value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
+    placeholder="Selecione a data e hora"
+    format="DD/MM/YYYY HH:mm"
+    className="w-full"
+  />
+</div>
+
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Nome do cliente</label>
+        <Input
+          type="text"
+          value={currentAgendamento?.cliente_nome}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_nome: e.target.value }))}
+          placeholder="Digite o nome do cliente"
+        />
+      </div>
+
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">E-mail do cliente</label>
+        <Input
+          type="email"
+          value={currentAgendamento?.cliente_email}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_email: e.target.value }))}
+          placeholder="Digite o e-mail do cliente"
+        />
+      </div>
+
+      
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Celular do cliente</label>
+        <Input
+          type="email"
+          value={currentAgendamento?.cliente_celular}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, cliente_celular: e.target.value }))}
+          placeholder="Digite o celular do cliente"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Selecione o Serviço</label>
+        <select
+          value={currentAgendamento?.servico_id}
+          onChange={(e) => setCurrentAgendamento((prev) => ({ ...prev!, servico_id: Number(e.target.value) }))}
+          className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:ring-blue-200"
+        >
+          <option value={0}>Selecione um serviço</option>
+          {servicos.map((servico) => (
+            <option key={servico.id} value={servico.id}>
+              {servico.nome}
+            </option>
+          ))}
+        </select>
+      </div>
+
+     
+     
+    </div>
+
+
+
+      </Modal>
+
+
+      <Modal
+        title="Adicionar Serviço"
+        visible={profissionalServicoModalVisible}
+        onOk={saveServico}
+        onCancel={closeprofissionalServicoModal}
+        footer={[
+          <Button key="cancel" onClick={closeprofissionalServicoModal}>Cancelar</Button>,
+          <Button key="submit" type="primary" onClick={saveServico}>Salvar</Button>,
         ]}
       >
 

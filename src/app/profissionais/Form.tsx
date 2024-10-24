@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
 import { supabase } from '../../lib/supabaseClient';
 import { Profissional } from '../types/Profissional';
+import { TipoProfissional} from '../types/TipoProfissional'
+
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br'; // Importa a localidade para o formato brasileiro
 
@@ -26,6 +28,8 @@ interface AlunoFormProps {
 const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null); // Estado para armazenar o nome da imagem
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null); // Estado para armazenar o caminho da imagem
+  const [tipoProfissional, setTIpoProfissional] = useState<TipoProfissional[]>([]);
+
 
   // Função para gerar um nome de arquivo aleatório
   const generateRandomFileName = (originalName: string) => {
@@ -93,6 +97,31 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
     }
   }, [initialValues]);
 
+
+  useEffect(() => {
+    // Limpa o estado de imagem ao carregar o formulário
+    fetchTiposProfissional();
+  }, [initialValues]);
+
+  //Busca dados do tipo de profissional
+  const fetchTiposProfissional = async () => {
+
+
+      const { data, error, count } = await supabase
+        .from('tipos_profissionais')
+        .select('*', { count: 'exact' })
+       
+      if (data) {
+        setTIpoProfissional(data);
+      } else if (error) {
+        console.error('Erro ao buscar Profissionais:', error.message);
+      }
+    
+  }
+
+
+
+
   return (
     <Form
       form={form}
@@ -118,6 +147,23 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
               ))}
             </Select>
           </Form.Item>
+
+
+          <Form.Item
+            name="tipo_profissional_id"
+            label="Tipo de profissional"
+            rules={[{ required: true, message: 'Por favor, selecione o tipo de profissional!' }]}
+          >
+            <Select>
+              {tipoProfissional.map(tipoProfissional => (
+                <Select.Option key={tipoProfissional.nome} value={tipoProfissional.id}>
+                  {tipoProfissional.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          
 
           <Form.Item
             name="nome"

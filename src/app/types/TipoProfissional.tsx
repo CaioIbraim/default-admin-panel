@@ -1,5 +1,5 @@
 // Interface para Tipos Profissionais
-interface TipoProfissional {
+export interface TipoProfissional {
     id: number;
     nome: string;
     descricao?: string;
