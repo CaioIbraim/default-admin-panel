@@ -150,7 +150,7 @@ export default function RootLayout({ children }: MyComponentProps) {
               {children}
             </Sidelayout>
           ) : (
-            <div className="p-4">{children}</div>
+            <div >{children}</div>
           )}
         </ThemeProvider>
       </body>
