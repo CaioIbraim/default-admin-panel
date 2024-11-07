@@ -118,7 +118,12 @@ const CursoManagement = () => {
         });
       } else {
         // Adicionando nova aula
-        const { error } = await supabase.from('aulas').insert([aulaData]);
+        const insertAulaData = {
+          ...form.getFieldsValue(),
+          video_url: videoUrl || currentAula?.video_url, // Mantém o vídeo atual se não houver novo
+          curso_id: id, // ID do curso
+        };
+        const { error } = await supabase.from('aulas').insert([insertAulaData]);
         if (error) throw error;
         notification.success({
           message: 'Aula Adicionada',
