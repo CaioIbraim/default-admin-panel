@@ -2,9 +2,10 @@ export interface Curso {
     id: number;
     titulo: string;
     descricao: string;
-    cargaHoraria: number;
+    carga_horaria: number;
     categoria: string; // para classificação
-    criadoEm: Date;
-    atualizadoEm: Date;
+    criado_em: Date;
+    atualizado_em: Date;
+    banner_url : string;
   }
   
