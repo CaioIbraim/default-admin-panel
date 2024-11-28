@@ -34,6 +34,15 @@ const upsertUser = async (user: any) => {
 
 
 
+
+
+   // Função para gerar um nome de arquivo aleatório
+   export const generateRandomFileName = (originalName: string) => {
+    const extension = originalName.split('.').pop();
+    const randomName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${randomName}.${extension}`;
+  };
+
   // Função para deletar um pagamento
   /*
   const deleteTodosPagamentos = () => {

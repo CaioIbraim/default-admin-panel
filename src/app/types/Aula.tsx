@@ -1,10 +1,13 @@
 export interface Aula {
     id: number;
-    treinamentoId: number;
+    treinamento_id: number;
+    curso_id: number;
     titulo: string;
     duracao: number; // em minutos
-    videoUrl: string; // URL do vídeo
-    criadoEm: Date;
-    atualizadoEm: Date;
+    video_url: string; // URL do vídeo
+    criado_em: Date;
+    atualizado_em: Date;
+    texto: string;
+    thumbnail: string;
   }
   

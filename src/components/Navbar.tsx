@@ -64,7 +64,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
                     width={52}
                     height={52}
                   />
-                  <span>STIVESGPRO</span>
+                  
                 </span>
               </Link>
 

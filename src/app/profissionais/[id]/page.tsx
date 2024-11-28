@@ -188,8 +188,6 @@ const ProfissionalManagement = () => {
     if (currentAgendamento) {
       try {
         const { id, ...agendamentoData } = currentAgendamento;
-   
-        console.log(id)
         
         const { data, error: fetchError } = await supabase
           .from('agendamentos')
@@ -627,20 +625,22 @@ const ProfissionalManagement = () => {
       <div>
 
 
-
-
-              
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Data e Hora do Agendamento</label>
+        {/* Data e Hora */}
+        <Form.Item
+          label="Data e Hora do Agendamento"
+          name="data_hora"
+          rules={[{ required: true, message: 'Por favor, selecione a data e hora!' }]}
+        >
           <DatePicker
             showTime
-            value={currentAgendamento?.data_hora ? moment(currentAgendamento.data_hora) : null}
-            placeholder="Selecione a data e hora"
+            
             format="DD/MM/YYYY HH:mm"
+            placeholder="Selecione a data e hora"
             className="w-full"
           />
-        </div>
+        </Form.Item>
 
+              
 
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">Nome do cliente</label>
