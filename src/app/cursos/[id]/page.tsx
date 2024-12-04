@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { Curso } from '../../types/Cursos';
 import { Aula } from '../../types/Aula';
+import { CategoriaCurso } from '../../types/CategoriaCurso';
 import { FaPen, FaTrash } from 'react-icons/fa';
 import {generateRandomFileName} from '../../../lib/utilidades'
 
@@ -21,6 +22,7 @@ const CursoManagement = () => {
 
   // Estado das aulas
   const [aulas, setAulas] = useState<Aula[]>([]);
+  const [categoriasCursos, setCategoriasCursos] = useState<CategoriaCurso[]>([]);
 
   // Modal visibility states
   const [AulaModalVisible, setAulaModalVisible] = useState(false);
@@ -34,10 +36,11 @@ const CursoManagement = () => {
   // Função para buscar o curso
   const fetchCurso = async () => {
     if (id) {
-      const { data, error } = await supabase.from('cursos').select('*, aulas(*)').eq('id', id).single();
+      const { data, error } = await supabase.from('cursos').select('*, aulas(*) , categoria_id(*)').eq('id', id).single();
       if (data) {
         setCurso(data);
         setAulas(data.aulas || []); // Assumindo que 'aulas' é o campo correto
+        setCategoriasCursos(data.categoria_id)
       } else if (error) {
         console.error('Erro ao buscar curso:', error.message);
       }
@@ -202,7 +205,12 @@ const CursoManagement = () => {
                   { title: 'Título', dataIndex: 'titulo', key: 'titulo' },
                   { title: 'Descrição', dataIndex: 'descricao', key: 'descricao' },
                   { title: 'Carga Horária', dataIndex: 'carga_horaria', key: 'carga_horaria' },
-                  { title: 'Categoria', dataIndex: 'categoria', key: 'categoria' },
+                  {
+                    title: 'Categoria',
+                    dataIndex: 'categoria_id', // Corrigir o nome do campo
+                    key: 'categoria_id',
+                    render: (text: any) => text ? text.nome : null, // Corrigir a renderização
+                  },
                 ]}
                 rowKey="id"
                 pagination={false}

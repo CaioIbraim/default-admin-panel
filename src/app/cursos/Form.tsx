@@ -111,14 +111,10 @@ const CursoForm: React.FC<CursoFormProps> = ({ form, initialValues, onFinish }) 
     }
   }, [initialValues]);
 
-
   useEffect(() => {
     fetchCategorias();
   }, [initialValues]);
   
-
-
-
   return (
     <Form
       form={form}
