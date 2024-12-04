@@ -10,19 +10,19 @@ import Formulario from './Form';
 
 import { Curso } from '../types/Cursos'; 
 
-const ProfissionalManagement = () => {
+const CursoManagement = () => {
   const [form] = Form.useForm();
-  const [Profissionals, setProfissionals] = useState<Curso[]>([]);
+  const [Cursos, setCursos] = useState<Curso[]>([]);
   
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [currentProfissional, setCurrentProfissional] = useState<Curso | undefined>(undefined);
+  const [currentCurso, setCurrentCurso] = useState<Curso | undefined>(undefined);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const itemsPerPage = 10;
 
-  const fetchProfissionalsData = async () => {
+  const fetchCursosData = async () => {
     const { data, error, count } = await supabase
       .from('cursos')
       .select('*', { count: 'exact' })
@@ -30,7 +30,7 @@ const ProfissionalManagement = () => {
       .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
     if (data) {
-      setProfissionals(data);
+      setCursos(data);
       setTotalItems(count || 0);
     } else if (error) {
       console.error('Erro ao buscar Cursos:', error.message);
@@ -42,16 +42,16 @@ const ProfissionalManagement = () => {
     const fetchUserData = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (data && !error) {
-        fetchProfissionalsData();
+        fetchCursosData();
       }
     };
 
     fetchUserData();
   }, [searchTerm, currentPage]);
 
-  const saveProfissional = async (values: any) => {
+  const saveCurso = async (values: any) => {
     try {
-      const Curso = { ...values, id: currentProfissional?.id };
+      const Curso = { ...values, id: currentCurso?.id };
       
       const { data, error } = await supabase
         .from('cursos')
@@ -91,7 +91,7 @@ const ProfissionalManagement = () => {
       }
 
       closeDrawer();
-      fetchProfissionalsData();
+      fetchCursosData();
     } catch (error) {
       console.error('Erro ao salvar Curso:', (error as Error).message);
       notification.error({
@@ -101,7 +101,7 @@ const ProfissionalManagement = () => {
     }
   };
 
-  const deleteProfissional = (id: number) => {
+  const deleteCurso = (id: number) => {
     Modal.confirm({
       title: 'Confirmar Exclusão',
       content: 'Você tem certeza que deseja excluir este Curso?',
@@ -117,7 +117,7 @@ const ProfissionalManagement = () => {
 
           if (error) throw error;
 
-          fetchProfissionalsData();
+          fetchCursosData();
 
           notification.success({
             message: 'Curso Excluído',
@@ -131,7 +131,7 @@ const ProfissionalManagement = () => {
   };
 
   const openDrawer = (Curso?: Curso) => {
-    setCurrentProfissional(Curso! || {
+    setCurrentCurso(Curso! || {
                         id : 0,
                         titulo: '',
                         descricao: '',
@@ -175,7 +175,7 @@ const ProfissionalManagement = () => {
 
       <List
         itemLayout="horizontal"
-        dataSource={Profissionals}
+        dataSource={Cursos}
         renderItem={(Curso) => (
           <List.Item
             actions={[
@@ -190,7 +190,7 @@ const ProfissionalManagement = () => {
                 type="primary"
                 danger
                 icon={<FaTrash />}
-                onClick={() => deleteProfissional(Curso.id!)}
+                onClick={() => deleteCurso(Curso.id!)}
               />,
               <Link key={Curso.id} href={`/cursos/${Curso.id}`}>
                 <Button type="link" icon={<FaInfo />} />
@@ -242,7 +242,7 @@ const ProfissionalManagement = () => {
               onClick={() => {
                 form
                   .validateFields()
-                  .then(values => saveProfissional(values))
+                  .then(values => saveCurso(values))
                   .catch(info => {
                     notification.error({
                       message: 'Erro ao validar formulário',
@@ -261,10 +261,10 @@ const ProfissionalManagement = () => {
           maxWidth: '100%',
         }}
       >
-        <Formulario onFinish={saveProfissional} form={form} initialValues={currentProfissional} />
+        <Formulario onFinish={saveCurso} form={form} initialValues={currentCurso} />
       </Drawer>
     </div>
   );
 };
 
-export default ProfissionalManagement;
+export default CursoManagement;
