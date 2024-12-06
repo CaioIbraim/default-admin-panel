@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
 import { supabase } from '../../lib/supabaseClient';
 import { Curso } from '../types/Cursos';
+import { CategoriaCurso } from '../types/CategoriaCurso';
 
 
 import dayjs from 'dayjs';
@@ -17,19 +18,29 @@ const statusOptions = [
   { id: false, nome: 'Inativo' }
 ];
 
-interface AlunoFormValues extends Curso {}
+interface CursoFormValues extends Curso {}
 
-interface AlunoFormProps {
+interface CursoFormProps {
   form: any;
   initialValues?: Curso; // Tipo correto
-  onFinish: (values: AlunoFormValues) => void; // Função para lidar com a submissão
+  onFinish: (values: CursoFormValues) => void; // Função para lidar com a submissão
 }
 
-const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) => {
+const CursoForm: React.FC<CursoFormProps> = ({ form, initialValues, onFinish }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null); // Estado para armazenar o nome da imagem
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null); // Estado para armazenar o caminho da imagem
-  
+  const [categoriasCursos, setCategoriasCursos] = useState<CategoriaCurso[]>([]);
 
+  const fetchCategorias = async () => {
+    
+      const { data, error } = await supabase.from('categoria_curso').select('*');
+      if (data) {
+        setCategoriasCursos(data);
+      } else if (error) {
+        console.error('Erro ao buscar aluno:', error.message);
+      }
+    
+  };
 
   // Função para gerar um nome de arquivo aleatório
   const generateRandomFileName = (originalName: string) => {
@@ -89,6 +100,9 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
     }
   };
 
+
+
+
   useEffect(() => {
     // Limpa o estado de imagem ao carregar o formulário
     if (initialValues) {
@@ -97,17 +111,15 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
     }
   }, [initialValues]);
 
-
+  useEffect(() => {
+    fetchCategorias();
+  }, [initialValues]);
   
-  
-
-
-
   return (
     <Form
       form={form}
       layout="vertical"
-      name="Aluno_form"
+      name="Curso_form"
       initialValues={{
         ...initialValues,
       }}
@@ -116,6 +128,34 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
       <Tabs defaultActiveKey="1">
         <TabPane tab="Informações Pessoais" key="1">
           
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true, message: 'Por favor, selecione um status!' }]}
+          >
+            <Select>
+              {statusOptions.map(status => (
+                <Select.Option key={status.nome} value={status.id}>
+                  {status.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="categoria_id"
+            label="Categoria"
+            rules={[{ required: true, message: 'Por favor, selecione uma categoria!' }]}
+          >
+            <Select>
+              {categoriasCursos.map(categoria => (
+                <Select.Option key={categoria.nome} value={categoria.id}>
+                  {categoria.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
 
           <Form.Item
             name="titulo"
@@ -123,6 +163,16 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
             rules={[{ required: true, message: 'Por favor, insira o titulo do curso!' }]}
           >
             <Input />
+          </Form.Item>
+
+
+         
+
+          <Form.Item
+            name="carga_horaria"
+            label="Carga Horária"
+          >
+            <Input type="number"/>
           </Form.Item>
 
           <Form.Item
@@ -180,4 +230,4 @@ const AlunoForm: React.FC<AlunoFormProps> = ({ form, initialValues, onFinish }) 
   );
 };
 
-export default AlunoForm;
+export default CursoForm;

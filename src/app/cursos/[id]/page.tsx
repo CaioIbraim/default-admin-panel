@@ -6,8 +6,9 @@ import { useParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { Curso } from '../../types/Cursos';
 import { Aula } from '../../types/Aula';
+import { CategoriaCurso } from '../../types/CategoriaCurso';
 import { FaPen, FaTrash } from 'react-icons/fa';
-import {generateRandomFileName} from '../../../lib/utilidades'
+import { generateRandomFileName } from '../../../lib/utilidades';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -21,6 +22,7 @@ const CursoManagement = () => {
 
   // Estado das aulas
   const [aulas, setAulas] = useState<Aula[]>([]);
+  const [categoriasCursos, setCategoriasCursos] = useState<CategoriaCurso[]>([]);
 
   // Modal visibility states
   const [AulaModalVisible, setAulaModalVisible] = useState(false);
@@ -34,10 +36,11 @@ const CursoManagement = () => {
   // Função para buscar o curso
   const fetchCurso = async () => {
     if (id) {
-      const { data, error } = await supabase.from('cursos').select('*, aulas(*)').eq('id', id).single();
+      const { data, error } = await supabase.from('cursos').select('*, aulas(*) , categoria_id(*)').eq('id', id).single();
       if (data) {
         setCurso(data);
         setAulas(data.aulas || []); // Assumindo que 'aulas' é o campo correto
+        setCategoriasCursos(data.categoria_id);
       } else if (error) {
         console.error('Erro ao buscar curso:', error.message);
       }
@@ -61,10 +64,9 @@ const CursoManagement = () => {
     form.resetFields();
   };
 
-  // Função para fazer o upload da imagem
+  // Função para fazer o upload do vídeo
   const handleVideoUpload = async (file: File) => {
     try {
-      
       const randomFileName = generateRandomFileName(file.name); // Gera um nome aleatório
       const { data, error } = await supabase.storage
         .from('bucket') // Nome do bucket que você criou no Supabase
@@ -79,30 +81,26 @@ const CursoManagement = () => {
 
       console.log('File uploaded:', data.fullPath);
 
-      const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`;
-      // setUploadedImagePath(imageUrl);
-      // setUploadedImage(randomFileName); // Armazena o nome aleatório da imagem
+      const videoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.fullPath}`;
       
-      form.setFieldsValue({ banner_url: imageUrl }); // Atualiza o campo imagem_url no formulário
-      return data; // Retorna os dados da resposta
-        } catch (error) {
-      alert('Erro ao fazer upload da imagem. Por favor, tente novamente.'); // Feedback ao usuário
+      return videoUrl; // Retorna o URL do vídeo carregado
+    } catch (error) {
+      alert('Erro ao fazer upload do vídeo. Por favor, tente novamente.'); // Feedback ao usuário
       return null; // Retorna null em caso de erro
-        }
+    }
   };
 
   // Função para salvar ou atualizar aula
   const saveAula = async () => {
     try {
       // Faz o upload do vídeo se houver
-      const videoFile = form.getFieldValue('video');
-      let videoUrl = null;
+      const videoFile = form.getFieldValue('video_url');
+      let videoUrl = currentAula?.video_url;
 
       if (videoFile && videoFile.file) {
-        videoUrl = await handleVideoUpload(videoFile.file); // Chama a função de upload do vídeo
+        videoUrl = await handleVideoUpload(videoFile.file); // Faz o upload do vídeo e obtém o URL
       }
 
-      // Se o vídeo foi carregado, inclui o URL no objeto de dados da aula
       const aulaData = {
         ...form.getFieldsValue(),
         video_url: videoUrl || currentAula?.video_url, // Mantém o vídeo atual se não houver novo
@@ -120,7 +118,7 @@ const CursoManagement = () => {
         // Adicionando nova aula
         const insertAulaData = {
           ...form.getFieldsValue(),
-          video_url: videoUrl || currentAula?.video_url, // Mantém o vídeo atual se não houver novo
+          video_url: videoUrl, // Salva o URL do vídeo
           curso_id: id, // ID do curso
         };
         const { error } = await supabase.from('aulas').insert([insertAulaData]);
@@ -135,6 +133,13 @@ const CursoManagement = () => {
       fetchCurso(); // Atualiza o curso e as aulas
     } catch (error) {
       console.error('Erro ao salvar aula:', (error as Error).message);
+    }
+  };
+
+  const handleFileChange = async (event: any) => {
+    const file = event.file?.originFileObj;
+    if (file) {
+      await handleVideoUpload(file); // Faz o upload do vídeo assim que um arquivo é selecionado
     }
   };
 
@@ -202,7 +207,12 @@ const CursoManagement = () => {
                   { title: 'Título', dataIndex: 'titulo', key: 'titulo' },
                   { title: 'Descrição', dataIndex: 'descricao', key: 'descricao' },
                   { title: 'Carga Horária', dataIndex: 'carga_horaria', key: 'carga_horaria' },
-                  { title: 'Categoria', dataIndex: 'categoria', key: 'categoria' },
+                  {
+                    title: 'Categoria',
+                    dataIndex: 'categoria_id', // Corrigir o nome do campo
+                    key: 'categoria_id',
+                    render: (text: any) => text ? text.nome : null, // Corrigir a renderização
+                  },
                 ]}
                 rowKey="id"
                 pagination={false}
@@ -224,43 +234,43 @@ const CursoManagement = () => {
             className="mt-4"
           />
         </TabPane>
-
-        
       </Tabs>
-
-
 
       {/* Modal de Aula */}
       <Modal
-          title={isEditing ? 'Editar Aula' : 'Adicionar Aula'}
-          visible={AulaModalVisible}
-          onOk={saveAula}
-          onCancel={closeAulaModal}
-          footer={[
-            <Button key="cancel" onClick={closeAulaModal}>Cancelar</Button>,
-            <Button key="submit" type="primary" onClick={saveAula}>Salvar</Button>,
-          ]}
-        >
-          <Form form={form} layout="vertical" initialValues={currentAula!}>
-            <Form.Item name="titulo" label="Título" rules={[{ required: true, message: 'Por favor, insira o título da aula' }]}>
-              <Input />
-            </Form.Item>
+        title={isEditing ? 'Editar Aula' : 'Adicionar Aula'}
+        visible={AulaModalVisible}
+        onOk={saveAula}
+        onCancel={closeAulaModal}
+        footer={[
+          <Button key="cancel" onClick={closeAulaModal}>Cancelar</Button>,
+          <Button key="submit" type="primary" onClick={saveAula}>Salvar</Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical" initialValues={currentAula!}>
+          <Form.Item name="titulo" label="Título" rules={[{ required: true, message: 'Por favor, insira o título da aula' }]}>
+            <Input />
+          </Form.Item>
 
-            <Form.Item name="duracao" label="Duração (em minutos)" rules={[{ required: true, message: 'Por favor, insira a duração da aula' }]}>
-              <Input type="number" />
-            </Form.Item>
+          <Form.Item name="duracao" label="Duração (em minutos)" rules={[{ required: true, message: 'Por favor, insira a duração da aula' }]}>
+            <Input type="number" />
+          </Form.Item>
 
-            <Form.Item name="texto" label="Descrição">
-              <Input.TextArea rows={4} />
-            </Form.Item>
+          <Form.Item name="texto" label="Descrição">
+            <Input.TextArea rows={4} />
+          </Form.Item>
 
-            <Form.Item name="video_url" label="Upload do Vídeo" valuePropName="file" getValueFromEvent={e => e?.file}>
-              <Upload name="video_url" beforeUpload={() => false}>
-                <Button>Selecionar Vídeo</Button>
-              </Upload>
-            </Form.Item>
-          </Form>
-        </Modal>
+          <Form.Item name="video_url">
+            <Input type='hidden' />
+          </Form.Item>
+
+          <Form.Item label="Upload do Vídeo" valuePropName="file" getValueFromEvent={e => e?.file}>
+            <Upload beforeUpload={handleFileChange}>
+              <Button>Selecionar Vídeo</Button>
+            </Upload>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
