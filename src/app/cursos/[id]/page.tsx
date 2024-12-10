@@ -94,16 +94,9 @@ const CursoManagement = () => {
   const saveAula = async () => {
     try {
       // Faz o upload do vídeo se houver
-      const videoFile = form.getFieldValue('video_url');
-      let videoUrl = currentAula?.video_url;
-
-      if (videoFile && videoFile.file) {
-        videoUrl = await handleVideoUpload(videoFile.file); // Faz o upload do vídeo e obtém o URL
-      }
-
+     
       const aulaData = {
         ...form.getFieldsValue(),
-        video_url: videoUrl || currentAula?.video_url, // Mantém o vídeo atual se não houver novo
       };
 
       if (isEditing && currentAula) {
@@ -118,7 +111,6 @@ const CursoManagement = () => {
         // Adicionando nova aula
         const insertAulaData = {
           ...form.getFieldsValue(),
-          video_url: videoUrl, // Salva o URL do vídeo
           curso_id: id, // ID do curso
         };
         const { error } = await supabase.from('aulas').insert([insertAulaData]);
