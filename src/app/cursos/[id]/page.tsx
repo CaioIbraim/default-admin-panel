@@ -163,6 +163,8 @@ const CursoManagement = () => {
   const columns = [
     { title: 'Título da Aula', dataIndex: 'titulo', key: 'titulo' },
     { title: 'Duração da Aula', dataIndex: 'duracao', key: 'duracao' },
+    { title: 'Vídeo da Aula', dataIndex: 'video_url', key: 'video_url' },
+    { title: 'Documentos de apoio da Aula', dataIndex: 'video_url', key: 'video_url' },
     {
       title: 'Ações',
       key: 'actions',
