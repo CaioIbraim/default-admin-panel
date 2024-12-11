@@ -53,12 +53,13 @@ export default function ClientAuthForm() {
     const { email, password } = values
 
     try {
-      const { error, data: { user } } = await supabase.auth.signInWithPassword({
+      const { error, data: { session } } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       
-      if (user) {
+      if (session) {
+
         setTimeout(() => {
           setIsLoading(false)
           toast({
@@ -69,7 +70,7 @@ export default function ClientAuthForm() {
 
         setTimeout(() => {
           router.refresh() // Redirecionamento após o sucesso
-        }, 1000)
+        }, 3000)
       }
 
       if(error){
@@ -83,7 +84,7 @@ export default function ClientAuthForm() {
       }
 
     } catch (error) {
-      console.log("CreateAccountForm", error)
+      console.log("LoginUser", error)
     }
   }
 

@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
   }catch(error){
     console.log("middleware", error)
   }
+
   
   /*
   if (pathname === '/auth' && token) {
