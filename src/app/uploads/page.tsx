@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import {Video} from '@/components/Video'
 
 export default function UploadVideoPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -15,12 +16,7 @@ export default function UploadVideoPage() {
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
 
 
-   // Função para gerar um nome de arquivo aleatório
-   const generateRandomFileName = (originalName: string) => {
-    const extension = originalName.split('.').pop();
-    const randomName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    return `${randomName}.${extension}`;
-  };
+   
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -42,7 +38,7 @@ export default function UploadVideoPage() {
     try {
       const fileExt = file.name.split('.').pop()
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
-      const filePath = `videos/${fileName}`
+      const filePath = `public/${fileName}`
 
       // Create an AbortController for the fetch request
       const abortController = new AbortController()
@@ -55,12 +51,11 @@ export default function UploadVideoPage() {
           setProgress(percentComplete)
         }
       }
-      const randomFileName = generateRandomFileName(file.name); // Gera um nome aleatório
-
+     
 
       const { data, error } = await supabase.storage
         .from('bucket') // Nome do bucket que você criou no Supabase
-        .upload(`public/${randomFileName}`, file, {
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
         });
@@ -71,7 +66,7 @@ export default function UploadVideoPage() {
       }
 
       const { data: { publicUrl } } = supabase.storage
-        .from('videos')
+        .from('bucket')
         .getPublicUrl(filePath)
 
       setUploadedUrl(publicUrl)
@@ -117,6 +112,7 @@ export default function UploadVideoPage() {
       {uploadedUrl && (
         <div className="mb-4">
           <p className="text-green-500 mb-2">Video uploaded successfully!</p>
+          
           <a
             href={uploadedUrl}
             target="_blank"
@@ -125,7 +121,9 @@ export default function UploadVideoPage() {
           >
             View uploaded video
           </a>
+<Video videoId={uploadedUrl}/>
         </div>
+
       )}
     </div>
   )
