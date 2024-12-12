@@ -9,28 +9,49 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   const req = request
 
-  try{
-    const supabase = createMiddlewareClient({ req, res})
+  try {
+    const supabase = createMiddlewareClient({ req, res })
     await supabase.auth.getSession()
-  }catch(error){
+  } catch (error) {
     console.log("middleware", error)
   }
 
+  // Base URL should be set in environment variable or hardcoded
+  const baseUrl = process.env.BASE_URL || '/';  // Replace with your actual base URL
   
-  /*
-  if (pathname === '/auth' && token) {
-    return NextResponse.redirect(new URL(getUrl('/app')))
-  }
-
+  // Get the URL from getUrl function
+  const authUrl = getUrl('/auth');
+  console.log('getUrl result:', authUrl);  // Log the result of getUrl
   
-  if (pathname.includes('/app') && !token) {
-    return NextResponse.redirect(new URL(getUrl('/auth')))
-  }
-  */
+  // Check if the URL is valid
+  try {
 
+    /*
+
+      if (!authUrl || !authUrl.startsWith('/')) {
+        throw new Error('Invalid URL returned from getUrl');
+      }
+
+      if (pathname === '/auth' && token) {
+        return NextResponse.redirect(new URL(authUrl, baseUrl));
+      }
+
+   
+
+    if (pathname.includes('/app') && !token) {
+      return NextResponse.redirect(new URL(authUrl, baseUrl));
+    }
+*/
+    if (pathname.includes('/inicio') && !token) {
+      return NextResponse.redirect(new URL(authUrl, baseUrl));
+    }
+
+  } catch (error) {
+    console.error("Error creating the redirect URL:", error);
+    return res;  // In case of an error, proceed normally without redirection
+  }
 
   return res
-
 }
 
 export const config = {
