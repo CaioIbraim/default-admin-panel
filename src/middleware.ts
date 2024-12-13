@@ -11,11 +11,12 @@ export async function middleware(request: NextRequest) {
 
   try {
     const supabase = createMiddlewareClient({ req, res })
-    await supabase.auth.getSession()
-  } catch (error) {
-    console.log("middleware", error)
-  }
+    const session = await supabase.auth.getSession()
+    console.log("Sessão ",session)
 
+
+
+    
   // Base URL should be set in environment variable or hardcoded
   const baseUrl = process.env.BASE_URL || '/';  // Replace with your actual base URL
   
@@ -41,7 +42,7 @@ export async function middleware(request: NextRequest) {
     if (pathname.includes('/app') && !token) {
       return NextResponse.redirect(new URL(authUrl, baseUrl));
     }
-*/
+   */
     if (pathname.includes('/inicio') && !token) {
       return NextResponse.redirect(new URL(authUrl, baseUrl));
     }
@@ -50,6 +51,13 @@ export async function middleware(request: NextRequest) {
     console.error("Error creating the redirect URL:", error);
     return res;  // In case of an error, proceed normally without redirection
   }
+
+
+
+  } catch (error) {
+    console.log("middleware", error)
+  }
+ 
 
   return res
 }
