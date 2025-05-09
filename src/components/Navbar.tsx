@@ -40,7 +40,7 @@ const NavComponent: React.FC<NavComponentProps> = ({ loggedIn, onLogout, userFul
   ];
 
   const navigationLoggedIn = [
-    { path: "inicio", label: "Inicio" },
+    { path: "dashboard", label: "Inicio" },
     { path: "associados", label: "Associados" },
     { path: "empresas", label: "Empresas" },
     { path: "pagamentos", label: "Pagamentos" },

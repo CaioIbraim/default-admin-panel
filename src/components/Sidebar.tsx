@@ -25,7 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ loggedIn, onLogout, userFullNa
   };
 
   const navItems = [
-    { icon: <FaHome />, path: 'inicio', label: 'Inicio' },
+    { icon: <FaHome />, path: 'dashboard', label: 'Inicio' },
     { icon: <FaUsers />, path: 'alunos', label: 'Alunos' },
     { icon: <FaUserCircle />, path: 'profissionais', label: 'Profissionais' },
     { icon: <FaGears />, path: 'servicos', label: 'Serviços' },

@@ -1,11 +1,12 @@
 export interface Treinamento {
     id: number;
-    cursoId: number;
-    dataInicio: Date;
-    dataFim: Date;
+    curso_id: number;
+    data_inicio: Date;
+    data_fim: Date;
     local: string;
     status: 'agendado' | 'concluído'; // enum para status
-    criadoEm: Date;
-    atualizadoEm: Date;
+    criado_em: Date;
+    atualizado_em: Date;
+    valor:number;
   }
   
