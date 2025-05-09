@@ -12,10 +12,15 @@ export class APIService {
   }
 
   static async getData<T>(table: string, query?: string) {
+
+    console.log("-----------------------")
+    console.log("Acessando api : ", table)
+    console.log("-----------------------")
+    
     const result = supabase
       .from(table)
       .select(query || '*') ;
-    return this.fetchWithError(result);
+    return result;
   }
 
   static async insertData<T>(table: string, data: Partial<T>) {

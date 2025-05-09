@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos adicionais para responsividade */
+@media (min-width: 768px) {
+  .ant-layout-sider {
+    position: fixed;
+    z-index: 1;
+    transition: margin-left 0.2s ease;
+    transform: translateX(0);
+  }
+  .ant-layout-sider-collapsed {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 767px) {
+  .ant-layout-sider {
+    position: fixed;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 10;
+  }
+  .ant-layout-sider:not(.ant-layout-sider-collapsed) {
+    transform: translateX(0%);
+  }
+}
+
+/* Ajusta o espaço do conteúdo quando o menu está colapsado em dispositivos móveis */
+.ant-layout {
+  transition: margin-left 0.3s ease;
+}
