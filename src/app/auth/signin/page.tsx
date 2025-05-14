@@ -6,7 +6,7 @@ import Image from "next/image"
 import { FaSignInAlt, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import {supabase} from '@/lib/supabaseClient';
-import '@/css/auth.css';
+import '@/../css/auth.css';
 import BackLink from '@/components/BackLink';
 
 import Swal from 'sweetalert2';
@@ -36,7 +36,7 @@ const SignIn = () => {
         showConfirmButton: false,
         timer: 1500,
         willClose: () => {
-          router.push('/inicio');
+          router.push('/admin/inicio');
         }
       });
     }

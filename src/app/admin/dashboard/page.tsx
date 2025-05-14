@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { FaHeartbeat, FaSearch, FaBook, FaChartLine, FaUsers, FaBuilding, FaDollarSign } from 'react-icons/fa';
 import '../../../css/style.css';
 import '../../../css/landing.css';

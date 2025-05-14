@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col  min-h-screen">
       {/* Hero Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
         <div className="container px-4 md:px-6">
@@ -20,7 +20,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/courses">
+                <Link href="/treinamentos">
                   <Button size="lg" className="gap-1.5">
                     Ver treinamentos Disponíveis <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -88,51 +88,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Courses Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-slate-50 dark:bg-slate-950">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Treinamentos em destaque</h2>
-              <p className="max-w-[900px] text-slate-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-slate-400">
-                Confira nossos treinamentos mais populares e comece a aprender ainda hoje.
-              </p>
-            </div>
-          </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Link key={i} href={`/courses/${i}`} className="group">
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
-                  <div className="aspect-video w-full overflow-hidden">
-                    <img
-                      src={`/placeholder.svg?height=400&width=600&text=Curso+${i}`}
-                      alt={`Curso ${i}`}
-                      className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">Curso de Desenvolvimento Web</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
-                      Domine técnicas modernas de desenvolvimento web do zero
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">R$ 49,99</span>
-                      <span className="text-xs text-slate-500">4.8 ★ (120 avaliações)</span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="flex justify-center">
-            <Link href="/courses">
-              <Button variant="outline" size="lg">
-                Ver Todos os treinamentos
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+     
     </div>
   )
 }

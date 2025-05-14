@@ -5,13 +5,13 @@ import Link from "next/link";
 import Image from "next/image"
 
 import { useRouter } from 'next/navigation';
-import {supabase} from '../../../lib/supabaseClient';
-import '../../../../css/auth.css';
+import {supabase} from '@/lib/supabaseClient';
+import '@/css/auth.css';
 import { Container } from '@/components/Container';
 import {  FaPlus, FaGoogle } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
-import BackLink from '../../../components/BackLink';
+import BackLink from '@/components/BackLink';
 
 type Provider = 'google' | 'linkedin' ;
 

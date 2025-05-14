@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { Aluno } from '../types/Aluno';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br'; // Importa a localidade para o formato brasileiro

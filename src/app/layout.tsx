@@ -65,27 +65,32 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex  min-h-screen flex-col">
+            
+            
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="container flex h-16 items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="container flex flex-row items-center justify-between h-16">
+
+
+                <div className="flex items-center gap-4">
                   <Link href="/" className="flex items-center gap-2">
                     <img src="/logo.png" alt="Logo DevCaioIbraim" width={82} height={82} />
                     <span className="text-xl font-bold">@DevCaioIbraim</span>
                   </Link>
                   <nav className="hidden md:flex gap-6 ml-6">
-                    <Link href="/courses" className="text-sm font-medium hover:underline underline-offset-4">
+                    <Link href="/treinamentos" className="text-sm font-medium hover:underline underline-offset-4">
                       Treinamentos
                     </Link>
                   </nav>
                 </div>
+
                 <div className="flex items-center gap-4">
                   {/* <div className="relative hidden md:flex">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input type="search" placeholder="Buscar cursos..." className="w-[200px] lg:w-[300px] pl-8" />
+                    <Input type="search" placeholder="Buscar tutorias, treinamentos, cursos..." className="w-[200px] lg:w-[300px] pl-8" />
                   </div> */}
 
-                  <Link href="/auth/login">
+                  <Link href="/auth/signin">
                     <Button variant="ghost" size="sm">
                       Entrar
                     </Button>
@@ -94,8 +99,12 @@ export default function RootLayout({
                     <Button size="sm">Cadastrar-se</Button>
                   </Link>
                 </div>
+
+
               </div>
             </header>
+
+
             <Suspense>
               <main className="flex-1">{children}</main>
             </Suspense>
