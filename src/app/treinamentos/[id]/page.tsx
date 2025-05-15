@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { PaymentModal } from '@/components/payment-modal';
 import { supabase } from '@/lib/supabaseClient'
 import { transcode } from "buffer";
+import Link from "next/link";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -15,6 +16,7 @@ export default function ProductPage() {
   const [mainImage, setMainImage] = useState("");
   const router = useRouter();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  
 
   const defaultImages = [
     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 ",
@@ -75,6 +77,17 @@ export default function ProductPage() {
     setIsPaymentModalOpen(true);
   };
 
+  const handleInscrever = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      router.push('/auth/signup');
+      return;
+    }
+
+    setIsPaymentModalOpen(true);
+  };
+
   return (
     <div className="bg-gray-100 py-8">
       <div className="container mx-auto px-4">
@@ -102,9 +115,15 @@ export default function ProductPage() {
                             {training.aulas.map((aula : any, index : number) => (
                             <tr key={index} className="border-b hover:bg-gray-50 transition">
                                 <td className="px-6 py-4 flex items-center gap-4">
-                                <div>
-                                    <p className="text-gray-800 font-medium">{aula.titulo }</p>
-                                </div>
+
+
+                                    <Link href={`/treinamentos/aula/${aula.id}`}>
+                                        <div>
+                                            <p className="text-gray-800 font-medium">{aula.titulo }</p>
+                                        </div>
+                                    </Link>
+
+
                                 </td>
                             </tr>
                             ))}
@@ -155,8 +174,10 @@ export default function ProductPage() {
 
                 {  (training.valor  == null) ? 
                 
-                <button className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Matricular-se gratuitamente
+                <button
+                onClick={handleInscrever}
+                 className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Inscreva-se gratuitamente
                 </button>
                 
                 : 

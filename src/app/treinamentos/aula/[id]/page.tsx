@@ -6,6 +6,9 @@ import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface LessonData {
   title: string
@@ -31,7 +34,13 @@ export default function LessonPage() {
         if (error) {
           throw error
         }
-        setLesson(data[0] as LessonData)
+        setInterval(() => {
+          setLesson(data[0] as LessonData)
+        }, 1000);
+
+
+
+
       } catch (error) {
         console.error('Error fetching lesson data:', error)
       } finally {
@@ -42,12 +51,14 @@ export default function LessonPage() {
     fetchLessonData()
   }, [id])
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
+  
   if (!lesson) {
-    return <div>Aula não encontrada</div>
+    return     (
+    <div className="flex items-center justify-center min-h-screen">
+      Aula não encontrada
+    </div>
+    )
+    
   }
 
   return (
@@ -63,16 +74,23 @@ export default function LessonPage() {
           </div>
         )}
 
-        <ScrollArea className="h-[400px] mb-6">
+        <ScrollArea className="h-screen mb-6">
           <div className="prose max-w-none">
-            <p className="text-gray-600 mb-4">{lesson.texto}</p>
+            <p className="text-gray-600 mb-4">
+              
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {lesson.texto}
+      
+              </ReactMarkdown>
+              
+              </p>
             <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
           </div>
         </ScrollArea>
 
         {lesson.images && lesson.images.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {lesson.images.map((imageUrl, index) => (
+            {lesson.images.map((imageUrl : string, index : number) => (
               <div key={index} className="relative aspect-square">
                 <Image
                   src={imageUrl}

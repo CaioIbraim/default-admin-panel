@@ -4,34 +4,29 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {Skeleton} from "@/components/ui/skeleton"; // Ajuste o caminho conforme sua estrutura
 import { supabase } from '@/lib/supabaseClient'
+import Image from "next/image";
 
 export default function ProductPage() {
   const { id } = useParams();
-  const [training, setTraining] = useState<any | []>([]);
+  const [produto, setProduto] = useState<any | []>([]);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState("");
 
-  const defaultImages = [
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 ",
-    "https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 ",
-    "https://images.unsplash.com/photo-1484704849700-f032a568e944?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 ",
-    "https://images.unsplash.com/photo-1496957961599-e35b69ef5d7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 ",
-    "https://images.unsplash.com/photo-1528148343865-51218c4a13e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080&q=80 "
-  ];
+  
 
   useEffect(() => {
     const fetchTraining = async () => {
       try {
         const { data, error } = await supabase
-          .from('cursos')
-          .select('*')
+          .from('produtos')
+          .select('*, empresas(*)')
           .eq('id', id);
 
-        setTraining(data[0]);
+        setProduto(data?.[0] || null);
         // Set initial main image
-        setMainImage(data?.banner_url?.[0] || defaultImages[0]);
+        setMainImage(data?.[0]?.imagens);
       } catch (error) {
-        console.error("Error fetching training:", error);
+        console.error("Error fetching produto:", error);
       } finally {
         setLoading(false);
       }
@@ -52,11 +47,11 @@ export default function ProductPage() {
     );
   }
 
-  if (!training) {
-    return <div className="p-6">Curso não encontrado</div>;
+  if (!produto) {
+    return <div className="p-6">Produto não encontrado</div>;
   }
 
-  const thumbnails = training.images?.slice(1, 5) || defaultImages.slice(1);
+  const thumbnails = produto.imagens?.slice(0, 5);
 
   return (
     <div className="bg-gray-100 py-8">
@@ -67,11 +62,13 @@ export default function ProductPage() {
           
           
           <div className="w-full md:w-1/2 px-4 mb-8">
+            
             <img
               src={mainImage}
-              alt={training.titulo || "Curso"}
-              className="w-full h-auto rounded-lg shadow-md mb-4"
+              alt={produto.nome || "Curso"}
+             className="w-full h-[300px] md:h-[400px] object-cover rounded-lg shadow-md mb-4"
             />
+
             <div className="flex gap-4 py-4 justify-center overflow-x-auto">
               {thumbnails.map((thumb: string, index : number) => (
                 <img
@@ -87,11 +84,24 @@ export default function ProductPage() {
 
           {/* Product Details */}
           <div className="w-full md:w-1/2 px-4">
-            <h2 className="text-3xl font-bold mb-2">{training.titulo}</h2>
-            {/* <p className="text-gray-600 mb-4">SKU: {training.sku || "N/A"}</p> */}
+          <div className="mb-4 flex items-center gap-2">
+            <img 
+              alt="Imagem da empresa" 
+              src={produto.empresas.imagem_url} 
+              width={50}
+              height={50}
+              className="rounded-full object-cover"
+            /> 
+            <span className="text-xl font-bold">{produto.empresas.nome}</span>
+          </div>
+            <h2 className="text-3xl font-bold mb-2">{produto.nome}</h2>
+            {/* <p className="text-gray-600 mb-4">SKU: {produto.sku || "N/A"}</p> */}
             <div className="mb-4">
-              <span className="text-2xl font-bold mr-2">R$ {training.valor?.toFixed(2) || '00,00'}</span>
+              <span className="text-2xl font-bold mr-2">R$ {produto.preco?.toFixed(2) || '00,00'}</span>
+              <span className="text-2xl font-bold mr-2">- {produto.unidade_medida}</span>
             </div>
+
+           
 
             <div className="flex items-center mb-4">
               {[...Array(5)].map((_, i) => (
@@ -112,25 +122,22 @@ export default function ProductPage() {
               <span className="ml-2 text-gray-600">4.5 (120 reviews)</span>
             </div>
 
-            <p className="text-gray-700 mb-6">{training.descricao}</p>
+            <p className="text-gray-700 mb-6">{produto.descricao}</p>
 
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">Duração:</h3>
-              <p>{training.carga_horaria } horas  de conteúdo</p>
-            </div>
+           
 
             <div className="flex space-x-4 mb-6">
               <button className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                {/* <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                </svg>
-                Matricular-se
+                </svg> */}
+                Comprar
               </button>
               <button className="bg-gray-200 flex gap-2 items-center text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                 </svg>
-                Favoritar
+                Por no Carrinho
               </button>
             </div>
           </div>

@@ -189,7 +189,7 @@ const ServicosManagement = () => {
                 icon={<FaTrash />}
                 onClick={() => deleteServicos(Servicos.id!)}
               />,
-              <Link key={Servicos.id} href={`/servicos/${Servicos.id}`}>
+              <Link key={Servicos.id} href={`/admin/servicos/${Servicos.id}`}>
                 <Button type="link" icon={<FaInfo />} />
               </Link>
             ]}
