@@ -11,16 +11,42 @@ export class APIService {
     return data as T;
   }
 
-  static async getData<T>(table: string, query?: string) {
-
+  static async getData<T>(
+    table: string,
+    options?: {
+      page?: number;
+      pageSize?: number;
+      query?: string;
+    }
+  ) {
     console.log("-----------------------")
     console.log("Acessando api : ", table)
     console.log("-----------------------")
-    
-    const result = supabase
+
+    let queryBuilder = supabase
       .from(table)
-      .select(query || '*') ;
-    return result;
+      .select('*', { count: 'exact' });
+
+    // Apply pagination if options are provided
+    if (options?.page && options?.pageSize) {
+      const from = (options.page - 1) * options.pageSize;
+      const to = from + options.pageSize - 1;
+      queryBuilder = queryBuilder.range(from, to);
+    }
+
+    const { data, error, count } = await queryBuilder;
+
+    if (error) {
+      console.error('Erro ao buscar dados:', error.message);
+      throw new Error(error.message);
+    }
+
+    return {
+      data: await this.fetchWithError<T[]>(queryBuilder as PostgrestFilterBuilder<any, any, any>),
+      totalCount: count,
+      page: options?.page || 1,
+      pageSize: options?.pageSize
+    };
   }
 
   static async insertData<T>(table: string, data: Partial<T>) {

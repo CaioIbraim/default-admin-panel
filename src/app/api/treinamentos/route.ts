@@ -1,16 +1,14 @@
-import { supabase } from '@/lib/supabaseClient'
 import { APIService } from '@/services/api'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
    
-    const { data, error, count } = await supabase
-    .from('servicos')
-    .select('*', { count: 'exact' })
+  const treinamentos = await APIService.getData('treinamentos',{page:1,pageSize:1})
     
     return NextResponse.json(
-        {  data }
+        {  treinamentos },
+        { status: 200 }
       )
     
   } catch (error) {

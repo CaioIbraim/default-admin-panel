@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement, LineElement, PointElement } from 'chart.js';
-import '../../../css/style.css';
-import '../../../css/landing.css';
+import '@/../css/style.css';
+import '@/../css/landing.css';
 
 // Configuração do Chart.js
 ChartJS.register(
