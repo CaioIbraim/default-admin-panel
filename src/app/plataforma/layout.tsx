@@ -1,87 +1,102 @@
 import type React from "react"
 import { Inter } from "next/font/google"
 import Link from "next/link"
-import { BookOpen, Search } from "lucide-react"
+import { GraduationCap } from "lucide-react"
 
 import { ThemeProvider } from "@/components/theme-provider"
-
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import "./globals.css"
 import { Suspense } from "react"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
 
 export const metadata = {
-  title: "LearnHub - Online Course Platform",
-  description: "A comprehensive online learning platform built with Next.js",
+  title: "Plataforma - DevCaioIbraim",
+  description: "Plataforma de aprendizagem online",
 }
 
-export default function RootLayout({
+export default function PlataformaLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="pt-BR" suppressHydrationWarning className="bg-background">
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            {/* Header */}
+            <header className="sticky top-0 z-50 w-full border-b border-border/40 glass">
               <div className="container flex h-16 items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Link href="/" className="flex items-center gap-2">
-                    <BookOpen className="h-6 w-6" />
-                    <span className="text-xl font-bold">CaioBraim</span>
+                <div className="flex items-center gap-8">
+                  <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground">
+                      <GraduationCap className="h-5 w-5 text-background" />
+                    </div>
+                    <span className="text-lg font-semibold tracking-tight">Plataforma</span>
                   </Link>
-                  <nav className="hidden md:flex gap-6 ml-6">
-                    <Link href="/courses" className="text-sm font-medium hover:underline underline-offset-4">
-                      Courses
+                  <nav className="hidden md:flex items-center gap-6">
+                    <Link 
+                      href="/plataforma/cursos" 
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Meus Cursos
                     </Link>
-                    <Link href="/instructors" className="text-sm font-medium hover:underline underline-offset-4">
-                      Instructors
+                    <Link 
+                      href="/plataforma/progresso" 
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Progresso
                     </Link>
-                    <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
-                      About
+                    <Link 
+                      href="/plataforma/certificados" 
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Certificados
                     </Link>
                   </nav>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative hidden md:flex">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input type="search" placeholder="Search courses..." className="w-[200px] lg:w-[300px] pl-8" />
-                  </div>
-                  
-                  <Link href="/auth/login">
-                    <Button variant="ghost" size="sm">
-                      Log in
+                <div className="flex items-center gap-3">
+                  <Link href="/">
+                    <Button variant="ghost" size="sm" className="text-sm">
+                      Voltar ao Inicio
                     </Button>
                   </Link>
-                  <Link href="/auth/signup">
-                    <Button size="sm">Sign up</Button>
-                  </Link>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
+                    <span className="text-sm font-medium">U</span>
+                  </div>
                 </div>
               </div>
             </header>
+
+            {/* Main Content */}
             <Suspense>
               <main className="flex-1">{children}</main>
             </Suspense>
-            <footer className="border-t py-6 md:py-0">
-              <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-                <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-                  © 2023 LearnHub. All rights reserved.
+
+            {/* Footer */}
+            <footer className="border-t border-border/40">
+              <div className="container flex flex-col items-center justify-between gap-4 py-8 md:h-16 md:flex-row md:py-0">
+                <p className="text-sm text-muted-foreground">
+                  © 2025 DevCaioIbraim. Plataforma de Aprendizagem.
                 </p>
-                <div className="flex gap-4">
-                  <Link href="/terms" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Terms
+                <nav className="flex items-center gap-6">
+                  <Link 
+                    href="/help" 
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Ajuda
                   </Link>
-                  <Link href="/privacy" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Privacy
+                  <Link 
+                    href="/support" 
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Suporte
                   </Link>
-                  <Link href="/contact" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Contact
-                  </Link>
-                </div>
+                </nav>
               </div>
             </footer>
           </div>

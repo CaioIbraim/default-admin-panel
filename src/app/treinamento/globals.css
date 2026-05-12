@@ -1,34 +1,45 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Treinamento globals - inherits from main design system */
+@import "../globals.css";
 
-/* Estilos adicionais para responsividade */
-@media (min-width: 768px) {
-  .ant-layout-sider {
-    position: fixed;
-    z-index: 1;
-    transition: margin-left 0.2s ease;
-    transform: translateX(0);
+/* Treinamento-specific utilities */
+@layer components {
+  /* Video player container */
+  .video-container {
+    @apply rounded-xl overflow-hidden bg-secondary aspect-video;
   }
-  .ant-layout-sider-collapsed {
-    transform: translateX(-100%);
-  }
-}
 
-@media (max-width: 767px) {
-  .ant-layout-sider {
-    position: fixed;
-    left: 0;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 10;
+  /* Exercise card */
+  .exercise-card {
+    @apply rounded-xl border border-border/40 bg-card p-6 transition-all duration-200;
   }
-  .ant-layout-sider:not(.ant-layout-sider-collapsed) {
-    transform: translateX(0%);
+  
+  .exercise-card:hover {
+    @apply border-border shadow-sm;
   }
-}
 
-/* Ajusta o espaço do conteúdo quando o menu está colapsado em dispositivos móveis */
-.ant-layout {
-  transition: margin-left 0.3s ease;
+  /* Quiz option */
+  .quiz-option {
+    @apply flex items-center gap-3 rounded-lg border border-border/40 bg-card p-4 cursor-pointer transition-all;
+  }
+  
+  .quiz-option:hover {
+    @apply border-border bg-secondary/50;
+  }
+  
+  .quiz-option.selected {
+    @apply border-foreground/30 bg-secondary;
+  }
+  
+  .quiz-option.correct {
+    @apply border-emerald-500/50 bg-emerald-500/10;
+  }
+  
+  .quiz-option.incorrect {
+    @apply border-red-500/50 bg-red-500/10;
+  }
+
+  /* Lesson navigation */
+  .lesson-nav {
+    @apply flex items-center justify-between border-t border-border/40 pt-6 mt-6;
+  }
 }
