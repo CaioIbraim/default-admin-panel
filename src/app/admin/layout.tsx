@@ -1,89 +1,107 @@
+"use client"
+
 import type React from "react"
 import { Inter } from "next/font/google"
-import Link from "next/link"
-import { BookOpen, Search } from "lucide-react"
-
 import { ThemeProvider } from "@/components/theme-provider"
-
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Menu, Bell, Search } from "lucide-react"
+import { useState } from "react"
 import "./globals.css"
-import { Suspense } from "react"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
 
-export const metadata = {
-  title: "LearnHub - Online Course Platform",
-  description: "A comprehensive online learning platform built with Next.js",
-}
-
-export default function RootLayout({
+export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="pt-BR" suppressHydrationWarning className="bg-background">
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col">
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="container flex h-16 items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Link href="/" className="flex items-center gap-2">
-                    <BookOpen className="h-6 w-6" />
-                    <span className="text-xl font-bold">CaioBraim</span>
-                  </Link>
-                  <nav className="hidden md:flex gap-6 ml-6">
-                    <Link href="/courses" className="text-sm font-medium hover:underline underline-offset-4">
-                      Courses
-                    </Link>
-                    <Link href="/instructors" className="text-sm font-medium hover:underline underline-offset-4">
-                      Instructors
-                    </Link>
-                    <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
-                      About
-                    </Link>
-                  </nav>
-                </div>
+          <div className="flex h-screen overflow-hidden">
+            {/* Mobile sidebar overlay */}
+            {mobileSidebarOpen && (
+              <div 
+                className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+            )}
+
+            {/* Sidebar - Desktop */}
+            <div className="hidden lg:flex">
+              <AdminSidebar 
+                collapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+              />
+            </div>
+
+            {/* Sidebar - Mobile */}
+            <div 
+              className={`fixed inset-y-0 left-0 z-50 lg:hidden transition-transform duration-300 ${
+                mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
+            >
+              <AdminSidebar 
+                collapsed={false} 
+                onToggle={() => setMobileSidebarOpen(false)} 
+              />
+            </div>
+
+            {/* Main content */}
+            <div className="flex flex-1 flex-col overflow-hidden">
+              {/* Top header */}
+              <header className="flex h-16 items-center justify-between border-b border-border/40 bg-card px-4 lg:px-6">
                 <div className="flex items-center gap-4">
-                  <div className="relative hidden md:flex">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input type="search" placeholder="Search courses..." className="w-[200px] lg:w-[300px] pl-8" />
-                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="lg:hidden"
+                    onClick={() => setMobileSidebarOpen(true)}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
                   
-                  <Link href="/auth/login">
-                    <Button variant="ghost" size="sm">
-                      Log in
-                    </Button>
-                  </Link>
-                  <Link href="/auth/signup">
-                    <Button size="sm">Sign up</Button>
-                  </Link>
+                  <div className="hidden sm:flex items-center gap-2 rounded-lg border border-border/40 bg-secondary/30 px-3 py-1.5">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <input 
+                      type="text" 
+                      placeholder="Pesquisar..." 
+                      className="w-48 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    />
+                  </div>
                 </div>
-              </div>
-            </header>
-            <Suspense>
-              <main className="flex-1">{children}</main>
-            </Suspense>
-            <footer className="border-t py-6 md:py-0">
-              <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-                <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-                  © 2023 LearnHub. All rights reserved.
-                </p>
-                <div className="flex gap-4">
-                  <Link href="/terms" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Terms
-                  </Link>
-                  <Link href="/privacy" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Privacy
-                  </Link>
-                  <Link href="/contact" className="text-sm text-muted-foreground hover:underline underline-offset-4">
-                    Contact
-                  </Link>
+
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-foreground" />
+                  </Button>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="hidden sm:block text-right">
+                      <p className="text-sm font-medium">Admin</p>
+                      <p className="text-xs text-muted-foreground">Administrador</p>
+                    </div>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
+                      <span className="text-sm font-medium">A</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </footer>
+              </header>
+
+              {/* Page content */}
+              <main className="flex-1 overflow-auto bg-background">
+                {children}
+              </main>
+            </div>
           </div>
         </ThemeProvider>
       </body>
