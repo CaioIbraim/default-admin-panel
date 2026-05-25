@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, DatePicker, Select, Tabs, Button } from 'antd';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { Curso } from '../types/Cursos';
 import { CategoriaCurso } from '../types/CategoriaCurso';
 

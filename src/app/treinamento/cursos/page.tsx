@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Drawer, List, notification, Modal, Pagination, Input, Form } from 'antd';
 import { FaPen, FaTrash, FaPlus, FaInfo } from 'react-icons/fa';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import Formulario from './Form';

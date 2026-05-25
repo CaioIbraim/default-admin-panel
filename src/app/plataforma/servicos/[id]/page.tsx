@@ -5,7 +5,7 @@ import { DatePicker, Button, Modal, Table, Input, notification, Typography, Tabs
 import moment, { Moment } from 'moment';
 import 'moment/locale/pt-br';
 import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { Profissional } from '../../types/Profissional'
 import { Agendamento } from '../../types/Agendamento'
 import { Servicos } from '../../types/Servicos'

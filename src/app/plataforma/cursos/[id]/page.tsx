@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Button, Modal, Table, Input, notification, Typography, Tabs, Form, Upload } from 'antd';
 import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { Curso } from '../../types/Cursos';
 import { Aula } from '../../types/Aula';
 import { CategoriaCurso } from '../../types/CategoriaCurso';
 import { FaPen, FaTrash } from 'react-icons/fa';
-import { generateRandomFileName } from '../../../lib/utilidades';
+import { generateRandomFileName } from '@/lib/utilidades';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;

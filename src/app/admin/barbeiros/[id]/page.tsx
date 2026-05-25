@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Modal, Table, Input, notification, Typography, Tabs, Card, Select } from 'antd';
 import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { Aluno } from '../../types/Aluno'
 const { Title } = Typography;
 const { TabPane } = Tabs;

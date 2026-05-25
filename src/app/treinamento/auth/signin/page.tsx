@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image"
 import { FaSignInAlt, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import {supabase} from '../../../lib/supabaseClient';
+import {supabase} from '@/lib/supabaseClient';
 import '../../../../css/auth.css';
 import BackLink from '../../../components/BackLink';
 
