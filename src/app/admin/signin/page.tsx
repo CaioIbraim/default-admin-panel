@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from "next/image"
 import { FaSignInAlt, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import {supabase} from '../../lib/supabaseClient';
+import {supabase} from '@/lib/supabaseClient';
 
 import Swal from 'sweetalert2';
 type Provider = 'google' | 'linkedin' ;
