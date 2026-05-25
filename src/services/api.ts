@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/supabaseClient';
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
-import { PostgrestError } from '@supabase/supabase-js';
+
+import { isSupabaseConfigured, supabase } from '@/lib/supabaseClient';
 
 export class APIService {
   static async fetchWithError<T>(
@@ -11,40 +11,34 @@ export class APIService {
     return data as T;
   }
 
-  static async getData<T>(table: string, query?: string) {
+  private static assertSupabaseActive() {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error(
+        'Supabase não está configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY para ativar os dados remotos.'
+      );
+    }
+  }
 
-    console.log("-----------------------")
-    console.log("Acessando api : ", table)
-    console.log("-----------------------")
-    
-    const result = supabase
-      .from(table)
-      .select(query || '*') ;
-    return result;
+  static async getData<T>(table: string, query?: string) {
+    this.assertSupabaseActive();
+    return supabase.from(table).select(query || '*');
   }
 
   static async insertData<T>(table: string, data: Partial<T>) {
-    const result = supabase
-      .from(table)
-      .insert(data)
-      .select();
+    this.assertSupabaseActive();
+    const result = supabase.from(table).insert(data).select();
     return this.fetchWithError(result as PostgrestFilterBuilder<any, any, any>);
   }
 
   static async updateData<T>(table: string, id: number, data: Partial<T>) {
-    const result = supabase
-      .from(table)
-      .update(data)
-      .eq('id', id)
-      .select() ;
+    this.assertSupabaseActive();
+    const result = supabase.from(table).update(data).eq('id', id).select();
     return this.fetchWithError(result as PostgrestFilterBuilder<any, any, any>);
   }
 
   static async deleteData(table: string, id: number) {
-    const result = supabase
-      .from(table)
-      .delete()
-      .eq('id', id);
+    this.assertSupabaseActive();
+    const result = supabase.from(table).delete().eq('id', id);
     return this.fetchWithError(result);
   }
 }

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { BookOpen, Clock, Users, ArrowRight, MessageCircle, FileText, Zap, Code2, Cog } from "lucide-react"
+import { BookOpen, Clock, Users, ArrowRight, MessageCircle, FileText } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,62 +16,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-const courses = [
-  {
-    id: "desenvolvimento-web-ia-qwen",
-    title: "Desenvolvimento Web com IA - QWEN",
-    description: "Aprenda a criar aplicacoes web modernas utilizando inteligencia artificial QWEN para acelerar seu desenvolvimento e criar interfaces inteligentes.",
-    image: "/images/course-web-ai.jpg",
-    duration: "12 horas",
-    modules: 8,
-    level: "Intermediario",
-    icon: Code2,
-    topics: [
-      "Introducao ao QWEN e modelos de IA",
-      "Integracao com Next.js e React",
-      "Criacao de chatbots inteligentes",
-      "Geracao de codigo com IA",
-      "Otimizacao de prompts",
-      "Deploy e producao"
-    ]
-  },
-  {
-    id: "desenvolvimento-fullstack-ia",
-    title: "Desenvolvimento FullStack com IA",
-    description: "Domine o desenvolvimento completo de aplicacoes, do frontend ao backend, utilizando ferramentas de IA para maximizar sua produtividade.",
-    image: "/images/course-fullstack.jpg",
-    duration: "20 horas",
-    modules: 12,
-    level: "Intermediario a Avancado",
-    icon: Zap,
-    topics: [
-      "Arquitetura FullStack moderna",
-      "Frontend com React e Next.js",
-      "Backend com Node.js e APIs",
-      "Banco de dados e ORM",
-      "Autenticacao e seguranca",
-      "CI/CD e DevOps com IA"
-    ]
-  },
-  {
-    id: "automacao-processos-ia",
-    title: "Automacao de Processos com IA",
-    description: "Transforme a operacao do seu negocio automatizando tarefas repetitivas e criando fluxos inteligentes com inteligencia artificial.",
-    image: "/images/course-automation.jpg",
-    duration: "15 horas",
-    modules: 10,
-    level: "Iniciante a Intermediario",
-    icon: Cog,
-    topics: [
-      "Fundamentos de automacao",
-      "Ferramentas no-code e low-code",
-      "Integracao de sistemas",
-      "Chatbots e atendimento automatizado",
-      "Automacao de marketing",
-      "Metricas e otimizacao"
-    ]
-  }
-]
+import { COURSE_CATALOG } from "@/lib/course-catalog"
+
+const courses = COURSE_CATALOG
 
 function RequestPDFDialog({ course }: { course: typeof courses[0] }) {
   const [phone, setPhone] = useState("")
